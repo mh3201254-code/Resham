@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ur-Latn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RESHAM — Atelier 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;1,9..144,450&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EFE6D3;
+    --paper-2:#E6DAC0;
+    --ink:#241F17;
+    --ink-soft:#4A4130;
+    --emerald:#1E4536;
+    --emerald-deep:#12291F;
+    --gold:#B48A4A;
+    --gold-light:#D9BD86;
+    --thread:#8C4B4B;
+    --card:#F7F1E4;
+    --line: rgba(36,31,23,0.22);
+    box-sizing:border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#1B1710; --paper-2:#241F17; --ink:#EFE6D3; --ink-soft:#C9BDA2;
+      --card:#241F17; --line: rgba(239,230,211,0.18);
+      --gold:#D9BD86; --gold-light:#EAD9B4;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#1B1710; --paper-2:#241F17; --ink:#EFE6D3; --ink-soft:#C9BDA2;
+    --card:#241F17; --line: rgba(239,230,211,0.18);
+    --gold:#D9BD86; --gold-light:#EAD9B4;
+  }
+  html{scroll-behavior:smooth; scroll-padding-top: env(safe-area-inset-top,0px);}
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Manrope',sans-serif; overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{ font-family:'Fraunces', serif; font-weight:450; margin:0; letter-spacing:-0.01em; }
+  img,svg{max-width:100%;}
+  a{color:inherit;}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 28px;}
+  ::selection{ background:var(--gold); color:var(--emerald-deep); }
+
+  /* stitched divider — thread motif instead of a plain hairline */
+  .stitch{ height:1px; margin:0 auto; max-width:1180px;
+    background-image: repeating-linear-gradient(90deg, var(--line) 0 10px, transparent 10px 18px);
+  }
+
+  /* ---------- Nav ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    padding-top: env(safe-area-inset-top, 0px);
+    background:rgba(239,230,211,0.86); backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  :root[data-theme="dark"] header, @media (prefers-color-scheme:dark){header{background:rgba(27,23,16,0.86);}}
+  nav{ display:flex; align-items:center; justify-content:space-between; padding:18px 28px; max-width:1180px; margin:0 auto; }
+  .logo{ font-family:'Fraunces',serif; font-size:22px; letter-spacing:0.04em; }
+  .logo b{ color:var(--emerald); font-weight:600; }
+  :root[data-theme="dark"] .logo b{ color:var(--gold-light); }
+  .navlinks{ display:flex; gap:30px; font-size:14px; }
+  .navlinks a{ text-decoration:none; opacity:0.85; border-bottom:1px solid transparent; padding-bottom:2px; transition:border-color .2s; }
+  .navlinks a:hover, .navlinks a:focus-visible{ border-color:var(--gold); }
+  .navlinks{ }
+  @media (max-width:720px){ .navlinks{display:none;} }
+  .cart-btn{ position:relative; border:1px solid var(--line); background:transparent; color:var(--ink);
+    border-radius:999px; padding:9px 16px 9px 14px; font-family:'Manrope'; font-size:14px; cursor:pointer;
+    display:flex; align-items:center; gap:8px; }
+  .cart-btn:hover{ border-color:var(--gold); }
+  .badge{ background:var(--emerald); color:#fff; border-radius:999px; font-size:11px; min-width:18px; height:18px;
+    display:inline-flex; align-items:center; justify-content:center; padding:0 4px; }
+  :root[data-theme="dark"] .badge{ background:var(--gold); color:var(--emerald-deep); }
+
+  /* ---------- Hero (cinematic 3D scroll banner) ---------- */
+  .hero{
+    position:relative; height:100svh; min-height:560px; overflow:hidden;
+    background: radial-gradient(120% 90% at 50% 20%, #16352A 0%, #12291F 45%, #0B1712 100%);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .hero-grain{ position:absolute; inset:0; opacity:0.5; mix-blend-mode:overlay;
+    background-image: radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.5) 0, transparent 60%),
+                       radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,.35) 0, transparent 60%),
+                       radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,.3) 0, transparent 60%);
+    background-size: 180px 180px; }
+  .hero-beam{ position:absolute; top:-20%; width:46%; height:150%; opacity:.28; filter:blur(6px);
+    background:linear-gradient(180deg, transparent, var(--gold-light) 45%, transparent 85%);
+    animation: heroDrift 16s ease-in-out infinite; }
+  .hero-beam.b1{ left:-6%; }
+  .hero-beam.b2{ left:60%; opacity:.16; animation-delay:-7s; }
+  @keyframes heroDrift{ 0%,100%{ transform:rotate(6deg) translateY(0);} 50%{ transform:rotate(-4deg) translateY(4%);} }
+  @media (prefers-reduced-motion: reduce){ .hero-beam{ animation:none; } }
+
+  .hero-inner{ position:relative; z-index:2; width:100%; max-width:1180px; padding:0 28px;
+    display:flex; flex-direction:column; align-items:center; text-align:center; will-change:transform,opacity; }
+  .eyebrow-line{ font-size:13px; color:var(--gold-light); margin-bottom:16px; display:flex; align-items:center; gap:10px; justify-content:center; letter-spacing:.02em;}
+  .eyebrow-line svg{width:20px; height:20px; flex:none;}
+  .hero h1{ font-size:clamp(40px,7vw,84px); line-height:0.98; color:#F6F0E2; max-width:14ch; }
+  .hero h1 .accent{ color:var(--gold-light); }
+  .hero p.lede{ margin-top:20px; max-width:46ch; font-size:17px; line-height:1.6; color:#C8BFA6; }
+  .hero-ctas{ margin-top:34px; display:flex; gap:16px; flex-wrap:wrap; justify-content:center; }
+  .btn{ font-family:'Manrope'; font-size:14px; font-weight:600; border-radius:999px; padding:14px 26px;
+    border:1px solid var(--ink); background:var(--ink); color:var(--paper); cursor:pointer; text-decoration:none; display:inline-block;
+    transition:transform .18s ease, background .18s ease; }
+  .btn:hover{ transform:translateY(-2px); }
+  .btn.ghost{ background:transparent; color:#F1E7D6; border-color:rgba(241,231,214,0.4); }
+  .btn.ghost:hover{ border-color:var(--gold-light); }
+  .hero .btn:not(.ghost){ background:var(--gold-light); color:#12291F; border-color:var(--gold-light); }
+
+  .hero-stage{ perspective:1400px; height:340px; margin-top:44px; display:flex; align-items:center; justify-content:center; }
+  .hero-card{
+    width:220px; height:310px; position:relative; transform-style:preserve-3d;
+    transform: rotateX(6deg) rotateY(-18deg) scale(1);
+    filter: drop-shadow(0 40px 50px rgba(0,0,0,0.45));
+  }
+  .hero-card .face{
+    position:absolute; inset:0; border-radius:14px; background:var(--card);
+    border:1px solid rgba(255,255,255,0.12); display:flex; align-items:center; justify-content:center;
+    backface-visibility:hidden;
+  }
+  .hero-card .face.back{ transform: rotateY(180deg) translateZ(0); background:var(--emerald); }
+  .hero-card .face.edge{ width:24px; left:auto; right:-24px; transform: rotateY(90deg) translateZ(12px); background:var(--emerald-deep); border-radius:0 14px 14px 0;}
+  .hero-card svg{ width:78%; }
+  .hero-tag{ position:absolute; bottom:-18px; left:-18px; background:var(--paper); border:1px solid var(--line);
+    border-radius:12px; padding:10px 14px; font-size:12px; transform:translateZ(60px); box-shadow:0 12px 24px rgba(0,0,0,.3);}
+  .hero-tag b{ display:block; font-family:'Fraunces'; font-size:15px; }
+  .scroll-cue{ position:absolute; bottom:30px; left:50%; transform:translateX(-50%); z-index:2;
+    display:flex; flex-direction:column; align-items:center; gap:8px; color:#C8BFA6; font-size:11px; letter-spacing:.04em; }
+  .scroll-cue svg{ width:14px; height:20px; animation: cueBounce 1.8s ease-in-out infinite; }
+  @keyframes cueBounce{ 0%,100%{ transform:translateY(0); opacity:.5;} 50%{ transform:translateY(6px); opacity:1;} }
+  @media (prefers-reduced-motion: reduce){ .scroll-cue svg{ animation:none; } }
+
+  /* ---------- Marquee ---------- */
+  .marquee{ border-top:1px solid var(--line); border-bottom:1px solid var(--line); overflow:hidden; padding:16px 0; margin-top:48px;}
+  .marquee-track{ display:flex; gap:48px; white-space:nowrap; width:max-content; animation: scrollLeft 32s linear infinite; }
+  @media (prefers-reduced-motion: reduce){ .marquee-track{ animation:none; } }
+  .marquee-track span{ font-family:'Fraunces'; font-style:italic; font-size:19px; color:var(--ink-soft); }
+  .marquee-track span:after{ content:'—'; margin-left:48px; color:var(--gold); font-style:normal; }
+  @keyframes scrollLeft{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+
+  /* ---------- Floating product / parallax ---------- */
+  .float-section{ padding:110px 0; position:relative; }
+  .float-grid{ display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center;}
+  @media (max-width:860px){ .float-grid{ grid-template-columns:1fr; } }
+  .float-visual{ height:460px; position:relative; }
+  .float-orb{ position:absolute; inset:0; margin:auto; width:340px; height:420px; will-change:transform; }
+  .float-orb svg{ width:100%; height:100%; }
+  .float-text .kicker{ font-size:13px; letter-spacing:.03em; color:var(--gold); font-family:'Manrope'; font-weight:700; }
+  :root[data-theme="dark"] .float-text .kicker{ color:var(--gold-light); }
+  .float-text h2{ font-size:clamp(28px,3.4vw,42px); margin-top:10px; max-width:12ch; }
+  .float-text p{ margin-top:18px; color:var(--ink-soft); line-height:1.65; max-width:42ch; }
+  .float-price{ margin-top:24px; font-family:'Fraunces'; font-size:22px; }
+
+  /* ---------- 360 viewer ---------- */
+  .spin-section{ padding:100px 0; background:var(--paper-2); }
+  .spin-grid{ display:grid; grid-template-columns:0.9fr 1.1fr; gap:50px; align-items:center;}
+  @media (max-width:860px){ .spin-grid{ grid-template-columns:1fr; } }
+  .spin-head h2{ font-size:clamp(28px,3.4vw,40px); max-width:11ch; }
+  .spin-head p{ margin-top:16px; color:var(--ink-soft); max-width:40ch; line-height:1.6; }
+  .spin-stage{ height:420px; display:flex; align-items:center; justify-content:center; perspective:1400px; touch-action:none; cursor:grab; }
+  .spin-stage:active{ cursor:grabbing; }
+  .spin-cube{ width:250px; height:360px; position:relative; transform-style:preserve-3d; transform: rotateY(0deg); }
+  .spin-face{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:var(--card);
+    border:1px solid var(--line); border-radius:12px; backface-visibility:hidden; }
+  .spin-face svg{ width:70%; }
+  .spin-face.f0{ transform: rotateY(0deg) translateZ(125px); }
+  .spin-face.f1{ transform: rotateY(90deg) translateZ(125px); }
+  .spin-face.f2{ transform: rotateY(180deg) translateZ(125px); }
+  .spin-face.f3{ transform: rotateY(270deg) translateZ(125px); }
+  .spin-hint{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:14px; }
+  .spin-dots{ display:flex; gap:8px; justify-content:center; margin-top:10px; }
+  .spin-dots i{ width:6px; height:6px; border-radius:50%; background:var(--line); display:block; }
+  .spin-dots i.on{ background:var(--gold); }
+
+  /* ---------- Fullscreen film ---------- */
+  .film{ position:relative; height:100vh; min-height:520px; overflow:hidden; background:var(--emerald-deep); }
+  .film-scene{ position:absolute; inset:0; }
+  .film-ribbon{ position:absolute; top:-10%; width:36%; height:130%; opacity:0.55;
+    background:linear-gradient(180deg, transparent, var(--gold) 40%, transparent 80%);
+    filter:blur(2px); animation: drift 14s ease-in-out infinite; }
+  .film-ribbon.r1{ left:8%; animation-delay:0s; }
+  .film-ribbon.r2{ left:38%; animation-delay:-4s; opacity:.35; }
+  .film-ribbon.r3{ left:68%; animation-delay:-9s; }
+  @keyframes drift{ 0%,100%{ transform:translateY(0) rotate(4deg) scaleY(1);} 50%{ transform:translateY(6%) rotate(-3deg) scaleY(1.06);} }
+  @media (prefers-reduced-motion: reduce){ .film-ribbon{ animation:none; } }
+  .film-content{ position:relative; z-index:2; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:#F1E7D6; padding:0 24px;}
+  .film-content .kicker{ font-size:13px; letter-spacing:.04em; color:var(--gold-light); }
+  .film-content h2{ color:#F6F0E2; font-size:clamp(30px,6vw,66px); margin-top:14px; max-width:14ch; }
+  .film-content p{ margin-top:18px; max-width:46ch; color:#D8CDB4; line-height:1.6; }
+  .film-note{ position:absolute; bottom:20px; right:24px; font-size:11px; color:#9C917A; z-index:2; }
+
+  /* ---------- Product grid ---------- */
+  .shop{ padding:100px 0; }
+  .shop-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:20px; flex-wrap:wrap; margin-bottom:40px;}
+  .shop-head h2{ font-size:clamp(28px,3.4vw,42px); max-width:12ch; }
+  .filters{ display:flex; gap:10px; flex-wrap:wrap; }
+  .chip{ border:1px solid var(--line); background:transparent; border-radius:999px; padding:8px 16px; font-size:13px; cursor:pointer; color:var(--ink); font-family:'Manrope'; }
+  .chip.active{ background:var(--emerald); border-color:var(--emerald); color:#fff; }
+  :root[data-theme="dark"] .chip.active{ background:var(--gold); border-color:var(--gold); color:var(--emerald-deep); }
+
+  .grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:26px; }
+  @media (max-width:900px){ .grid{ grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:560px){ .grid{ grid-template-columns:1fr; } }
+
+  .pcard{ perspective:1200px; }
+  .pcard-inner{ position:relative; width:100%; height:380px; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.2,.8,.2,1); }
+  .pcard:hover .pcard-inner, .pcard:focus-within .pcard-inner{ transform: rotateY(180deg); }
+  .pface{ position:absolute; inset:0; border-radius:16px; backface-visibility:hidden; border:1px solid var(--line); overflow:hidden;
+    display:flex; flex-direction:column; }
+  .pface.front{ background:var(--card); }
+  .pface.back{ background:var(--emerald); color:#F1E7D6; transform:rotateY(180deg); padding:24px; justify-content:space-between; }
+  .pface-art{ flex:1; display:flex; align-items:center; justify-content:center; }
+  .pface-art svg{ width:62%; }
+  .pface-meta{ padding:14px 18px 18px; border-top:1px dashed var(--line); }
+  .pface-meta .name{ font-family:'Fraunces'; font-size:17px; }
+  .pface-meta .fabric{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+  .pface-meta .price{ font-family:'Fraunces'; margin-top:8px; font-size:16px; color:var(--emerald); }
+  :root[data-theme="dark"] .pface-meta .price{ color:var(--gold-light); }
+  .pback-top .name{ font-family:'Fraunces'; font-size:19px; }
+  .pback-top p{ font-size:13px; line-height:1.55; color:#D8CDB4; margin-top:10px; }
+  .pback-btn{ align-self:flex-start; background:var(--gold); color:var(--emerald-deep); border:none; border-radius:999px;
+    padding:11px 20px; font-family:'Manrope'; font-weight:700; font-size:13px; cursor:pointer; }
+  .swatches{ display:flex; gap:6px; margin-top:10px; }
+  .swatches i{ width:16px; height:16px; border-radius:50%; display:block; border:1px solid rgba(255,255,255,0.5); }
+
+  /* ---------- Product modal ---------- */
+  .overlay{ position:fixed; inset:0; background:rgba(18,17,12,0.5); backdrop-filter:blur(3px); z-index:90;
+    display:none; align-items:center; justify-content:center; padding:20px; }
+  .overlay.open{ display:flex; }
+  .modal{ background:var(--paper); border-radius:20px; max-width:760px; width:100%; max-height:88vh; overflow:auto;
+    display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--line); }
+  @media (max-width:640px){ .modal{ grid-template-columns:1fr; } }
+  .modal-art{ background:var(--card); display:flex; align-items:center; justify-content:center; padding:30px; position:relative; }
+  .modal-art svg{ width:70%; transition: filter .2s ease; }
+  .modal-close{ position:absolute; top:14px; right:14px; border:none; background:transparent; font-size:20px; cursor:pointer; color:var(--ink); }
+  .modal-info{ padding:30px 28px; }
+  .modal-info .name{ font-size:24px; }
+  .modal-info .fabric{ color:var(--ink-soft); font-size:13px; margin-top:4px; }
+  .modal-info .price{ font-family:'Fraunces'; font-size:20px; margin-top:14px; color:var(--emerald); }
+  :root[data-theme="dark"] .modal-info .price{ color:var(--gold-light); }
+  .opt-label{ font-size:12px; font-weight:700; color:var(--ink-soft); margin-top:22px; margin-bottom:8px; }
+  .color-row{ display:flex; gap:10px; }
+  .color-dot{ width:30px; height:30px; border-radius:50%; border:2px solid transparent; cursor:pointer; }
+  .color-dot.sel{ border-color:var(--ink); }
+  .size-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .size-btn{ border:1px solid var(--line); background:transparent; border-radius:8px; padding:9px 14px; font-size:13px; cursor:pointer; font-family:'Manrope'; }
+  .size-btn.sel{ background:var(--ink); color:var(--paper); border-color:var(--ink); }
+  .qty-row{ display:flex; align-items:center; gap:14px; margin-top:22px; }
+  .qty-row button{ width:32px; height:32px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; font-size:16px; }
+  .add-btn{ margin-top:24px; width:100%; }
+
+  /* ---------- Cart drawer ---------- */
+  .drawer-overlay{ position:fixed; inset:0; background:rgba(18,17,12,0.4); z-index:95; display:none; }
+  .drawer-overlay.open{ display:block; }
+  .drawer{ position:fixed; top:0; right:0; height:100%; width:min(400px,100%); background:var(--paper); z-index:96;
+    transform:translateX(100%); transition:transform .32s ease; display:flex; flex-direction:column;
+    padding-top: env(safe-area-inset-top,0px); padding-bottom: env(safe-area-inset-bottom,0px); box-shadow:-20px 0 40px rgba(0,0,0,0.15); }
+  .drawer.open{ transform:translateX(0); }
+  .drawer-head{ display:flex; justify-content:space-between; align-items:center; padding:22px 24px; border-bottom:1px solid var(--line); }
+  .drawer-head h3{ font-size:20px; }
+  .drawer-body{ flex:1; overflow:auto; padding:18px 24px; }
+  .cart-item{ display:flex; gap:14px; padding:14px 0; border-bottom:1px dashed var(--line); }
+  .cart-item svg{ width:52px; height:64px; flex:none; }
+  .ci-name{ font-family:'Fraunces'; font-size:15px; }
+  .ci-meta{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+  .ci-controls{ display:flex; align-items:center; gap:10px; margin-top:8px; }
+  .ci-controls button{ width:24px; height:24px; border-radius:50%; border:1px solid var(--line); background:transparent; cursor:pointer; }
+  .ci-remove{ margin-left:auto; background:none; border:none; color:var(--thread); font-size:12px; cursor:pointer; text-decoration:underline; }
+  .drawer-foot{ padding:20px 24px; border-top:1px solid var(--line); }
+  .subtotal-row{ display:flex; justify-content:space-between; font-family:'Fraunces'; font-size:18px; margin-bottom:16px; }
+  .empty-cart{ text-align:center; padding:60px 10px; color:var(--ink-soft); }
+  .empty-cart svg{ width:60px; opacity:.5; margin-bottom:14px; }
+
+  footer{ border-top:1px solid var(--line); padding:60px 0 40px; }
+  .foot-grid{ display:flex; justify-content:space-between; gap:30px; flex-wrap:wrap; }
+  .foot-grid .logo{ margin-bottom:10px; }
+  .foot-grid p{ color:var(--ink-soft); font-size:14px; max-width:34ch; line-height:1.6; }
+  .foot-links{ display:flex; gap:40px; flex-wrap:wrap; }
+  .foot-links h4{ font-size:12px; color:var(--ink-soft); margin-bottom:12px; font-weight:700; }
+  .foot-links a{ display:block; font-size:14px; text-decoration:none; margin-bottom:8px; opacity:.85; }
+  .foot-links a:hover{ opacity:1; text-decoration:underline; }
+  .foot-bottom{ margin-top:40px; font-size:12px; color:var(--ink-soft); display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+
+  :focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo"><b>RESHAM</b> atelier</div>
+    <div class="navlinks">
+      <a href="#shop">Collection</a>
+      <a href="#spin">360° View</a>
+      <a href="#film">Film</a>
+      <a href="#about">Atelier</a>
+    </div>
+    <button class="cart-btn" id="cartOpenBtn" aria-haspopup="dialog">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16l-1.5 11a2 2 0 0 1-2 1.7H7.5a2 2 0 0 1-2-1.7L4 7Z"/><path d="M8 7V5a4 4 0 0 1 8 0v2"/></svg>
+      Cart <span class="badge" id="cartCount">0</span>
+    </button>
+  </nav>
+</header>
+
+<!-- ================= HERO (cinematic 3D scroll banner) ================= -->
+<section class="hero" id="heroBanner">
+  <div class="hero-grain"></div>
+  <div class="hero-beam b1"></div>
+  <div class="hero-beam b2"></div>
+
+  <div class="hero-inner" id="heroInner">
+    <div class="eyebrow-line">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 12h16M4 6h10M4 18h7"/></svg>
+      Pakistan's atelier for modern pret &amp; luxury lawn
+    </div>
+    <h1>Cloth, drawn <span class="accent">like couture.</span></h1>
+    <p class="lede">RESHAM's 2026 edit is sketched, not photographed — hand-inked silhouettes in emerald ink and gold thread, cut for the woman who wears her clothes, not the trend.</p>
+    <div class="hero-ctas">
+      <a href="#shop" class="btn">Explore the collection</a>
+      <a href="#spin" class="btn ghost">See it in 360°</a>
+    </div>
+
+    <div class="hero-stage">
+      <div class="hero-card" id="heroCard">
+        <div class="face front">
+          <svg viewBox="0 0 200 280" id="heroGarment"></svg>
+        </div>
+        <div class="face back"></div>
+        <div class="face edge"></div>
+        <div class="hero-tag"><b>Zoya Kurta</b>Hand-block, emerald silk</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-cue">
+    Scroll
+    <svg viewBox="0 0 14 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="12" height="18" rx="6"/><circle cx="7" cy="6" r="1.4" fill="currentColor"/></svg>
+  </div>
+</section>
+
+<div class="marquee">
+  <div class="marquee-track" id="marqueeTrack"></div>
+</div>
+
+<!-- ================= FLOATING PRODUCT ================= -->
+<section class="float-section">
+  <div class="wrap float-grid">
+    <div class="float-visual">
+      <div class="float-orb" id="floatOrb">
+        <svg viewBox="0 0 200 280" id="floatGarment"></svg>
+      </div>
+    </div>
+    <div class="float-text">
+      <div class="kicker">The signature piece</div>
+      <h2>Anaya — threaded in old gold</h2>
+      <p>A single silhouette, worked entirely by hand: tilla embroidery along the neckline, a dupatta that falls like it was drawn with one unbroken line. Scroll, and watch it turn toward you.</p>
+      <div class="float-price">Rs. 12,900</div>
+      <div class="hero-ctas" style="margin-top:20px;">
+        <button class="btn" onclick="openModal('p2')">View piece</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="stitch"></div>
+
+<!-- ================= 360 VIEW ================= -->
+<section class="spin-section" id="spin">
+  <div class="wrap spin-grid">
+    <div class="spin-head">
+      <div class="kicker" style="color:var(--gold); font-weight:700; font-size:13px;">360° atelier view</div>
+      <h2 style="margin-top:10px;">Turn it over in your hands.</h2>
+      <p>Every RESHAM piece is inked from four angles — front, side, back, detail — the way a darzi turns cloth on the table before the first cut.</p>
+    </div>
+    <div>
+      <div class="spin-stage" id="spinStage">
+        <div class="spin-cube" id="spinCube">
+          <div class="spin-face f0"><svg viewBox="0 0 200 280" class="spinSvg" data-angle="front"></svg></div>
+          <div class="spin-face f1"><svg viewBox="0 0 200 280" class="spinSvg" data-angle="side"></svg></div>
+          <div class="spin-face f2"><svg viewBox="0 0 200 280" class="spinSvg" data-angle="back"></svg></div>
+          <div class="spin-face f3"><svg viewBox="0 0 200 280" class="spinSvg" data-angle="detail"></svg></div>
+        </div>
+      </div>
+      <p class="spin-hint">Drag left or right to rotate</p>
+      <div class="spin-dots"><i class="on" data-i="0"></i><i data-i="1"></i><i data-i="2"></i><i data-i="3"></i></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FULLSCREEN FILM ================= -->
+<section class="film" id="film">
+  <div class="film-scene">
+    <div class="film-ribbon r1"></div>
+    <div class="film-ribbon r2"></div>
+    <div class="film-ribbon r3"></div>
+  </div>
+  <div class="film-content">
+    <div class="kicker">The 2026 film — atelier cut</div>
+    <h2>Silk moves before it's worn.</h2>
+    <p>An ambient study in drape and gold thread, built for the collection launch. Send us your own film and we'll set it here in full screen, sound and all.</p>
+  </div>
+  <div class="film-note">Animated placeholder — swap in your brand film</div>
+</section>
+
+<!-- ================= SHOP ================= -->
+<section class="shop" id="shop">
+  <div class="wrap">
+    <div class="shop-head">
+      <h2>The 2026 edit</h2>
+      <div class="filters" id="filters">
+        <button class="chip active" data-f="all">All</button>
+        <button class="chip" data-f="lawn">Lawn</button>
+        <button class="chip" data-f="silk">Silk</button>
+        <button class="chip" data-f="chiffon">Chiffon</button>
+        <button class="chip" data-f="velvet">Velvet</button>
+      </div>
+    </div>
+    <div class="grid" id="productGrid"></div>
+  </div>
+</section>
+
+<footer id="about">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="logo"><b>RESHAM</b> atelier</div>
+        <p>Hand-inked womenswear, cut and stitched in Lahore. Every piece on this page is a sketch of the real thing — order a sample card before your first full order.</p>
+      </div>
+      <div class="foot-links">
+        <div>
+          <h4>Shop</h4>
+          <a href="#shop">Collection</a>
+          <a href="#spin">360° view</a>
+        </div>
+        <div>
+          <h4>Order</h4>
+          <a href="#" onclick="openCart(); return false;">Your cart</a>
+          <a href="https://wa.me/920000000000" target="_blank" rel="noopener">WhatsApp us</a>
+        </div>
+      </div>
+    </div>
+    <div class="stitch" style="margin:36px 0 0;"></div>
+    <div class="foot-bottom">
+      <span>© 2026 RESHAM Atelier, Pakistan</span>
+      <span>Prices in PKR · Custom stitching available</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ Product modal ============ -->
+<div class="overlay" id="modalOverlay" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-art">
+      <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+      <svg viewBox="0 0 200 280" id="modalGarment"></svg>
+    </div>
+    <div class="modal-info">
+      <div class="name" id="modalName"></div>
+      <div class="fabric" id="modalFabric"></div>
+      <div class="price" id="modalPrice"></div>
+
+      <div class="opt-label">Colour</div>
+      <div class="color-row" id="modalColors"></div>
+
+      <div class="opt-label">Size</div>
+      <div class="size-row" id="modalSizes"></div>
+
+      <div class="opt-label">Quantity</div>
+      <div class="qty-row">
+        <button id="qtyMinus">−</button>
+        <span id="qtyVal">1</span>
+        <button id="qtyPlus">+</button>
+      </div>
+
+      <button class="btn add-btn" id="modalAddBtn">Add to cart</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Cart drawer ============ -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="cartDrawer" role="dialog" aria-modal="true">
+  <div class="drawer-head">
+    <h3>Your cart</h3>
+    <button class="modal-close" id="drawerClose" aria-label="Close">✕</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot" id="drawerFoot">
+    <div class="subtotal-row"><span>Subtotal</span><span id="subtotalVal">Rs. 0</span></div>
+    <button class="btn" style="width:100%;" id="checkoutBtn">Checkout on WhatsApp</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- Garment SVG generator ----------------
+     One vector "sketch" is reused everywhere, recoloured and
+     varied per product so nothing needs a photograph. */
+  function garmentSVG(opts){
+    opts = opts || {};
+    var color = opts.color || '#1E4536';
+    var ink   = opts.ink   || '#241F17';
+    var gold  = opts.gold  || '#B48A4A';
+    var sleeveless = !!opts.sleeveless;
+    var view = opts.view || 'front'; // front | side | back | detail
+    var flip = view === 'side' ? ' transform="scale(-1,1) translate(-200,0)"' : '';
+    var dupatta = view !== 'detail';
+    var embroideryDensity = opts.embroidery || 6;
+    var dots = '';
+    for(var i=0;i<embroideryDensity;i++){
+      var x = 70 + i*(60/(embroideryDensity-1||1));
+      dots += '<circle cx="'+x.toFixed(1)+'" cy="98" r="1.6" fill="'+gold+'"/>';
+    }
+    var sleeves = sleeveless ? '' :
+      '<path d="M62 92 C40 100 28 130 34 160 L52 156 C50 132 58 110 70 98 Z" fill="'+color+'" stroke="'+ink+'" stroke-width="1.2"/>' +
+      '<path d="M138 92 C160 100 172 130 166 160 L148 156 C150 132 142 110 130 98 Z" fill="'+color+'" stroke="'+ink+'" stroke-width="1.2"/>';
+    var back = view === 'back' ? '<path d="M84 96 L84 250" stroke="'+gold+'" stroke-width="1" stroke-dasharray="3 4"/>' : '';
+    var detail = view === 'detail' ?
+      '<g>'+dots+'<circle cx="100" cy="86" r="14" fill="none" stroke="'+gold+'" stroke-width="1.4"/></g>' :
+      '<g>'+dots+'</g>';
+    return '<g'+flip+'>' +
+      '<ellipse cx="100" cy="60" rx="17" ry="19" fill="none" stroke="'+ink+'" stroke-width="1.6"/>' +
+      sleeves +
+      '<path d="M70 98 C70 88 84 80 100 80 C116 80 130 88 130 98 L136 250 C110 262 90 262 64 250 Z" fill="'+color+'" stroke="'+ink+'" stroke-width="1.6"/>' +
+      (dupatta ? '<path d="M78 92 C40 130 34 190 58 246" fill="none" stroke="'+gold+'" stroke-width="2" opacity="0.85"/>' : '') +
+      detail + back +
+      '</g>';
+  }
+
+  var svgWrap = function(inner, vb){ return '<svg viewBox="'+(vb||'0 0 200 280')+'" xmlns="http://www.w3.org/2000/svg">'+inner+'</svg>'; };
+
+  /* ---------------- Product data ---------------- */
+  var PRODUCTS = [
+    { id:'p1', name:'Zoya Kurta', fabric:'Hand-block emerald silk', cat:'silk', price:8500,
+      colors:[{n:'Emerald',v:'#1E4536'},{n:'Ink',v:'#241F17'},{n:'Rose thread',v:'#8C4B4B'}],
+      sizes:['XS','S','M','L','XL'], sleeveless:false, embroidery:6,
+      blurb:'Hand-block printed silk, finished with a single line of running gold thread at the hem.' },
+    { id:'p2', name:'Anaya, old gold', fabric:'Tilla-worked chiffon', cat:'chiffon', price:12900,
+      colors:[{n:'Gold dust',v:'#B48A4A'},{n:'Deep emerald',v:'#12291F'},{n:'Ivory',v:'#E6DAC0'}],
+      sizes:['S','M','L','XL'], sleeveless:false, embroidery:9,
+      blurb:'Our signature piece — tilla embroidery worked entirely by hand along the neckline.' },
+    { id:'p3', name:'Meher, ivory drape', fabric:'Pure lawn, 2026 edit', cat:'lawn', price:6400,
+      colors:[{n:'Ivory',v:'#E6DAC0'},{n:'Sage',v:'#5C7C63'},{n:'Ink',v:'#241F17'}],
+      sizes:['XS','S','M','L'], sleeveless:true, embroidery:4,
+      blurb:'Light summer lawn, sleeveless cut, a quiet dupatta drape for everyday wear.' },
+    { id:'p4', name:'Sana, rose organza', fabric:'Layered organza gown', cat:'chiffon', price:15900,
+      colors:[{n:'Rose thread',v:'#8C4B4B'},{n:'Gold dust',v:'#B48A4A'},{n:'Ink',v:'#241F17'}],
+      sizes:['S','M','L'], sleeveless:false, embroidery:8,
+      blurb:'Full-length organza, cut for evening — the dupatta pools rather than falls.' },
+    { id:'p5', name:'Alina, noir velvet', fabric:'Winter velvet shawl-set', cat:'velvet', price:11200,
+      colors:[{n:'Ink',v:'#241F17'},{n:'Deep emerald',v:'#12291F'},{n:'Gold dust',v:'#B48A4A'}],
+      sizes:['S','M','L','XL'], sleeveless:false, embroidery:5,
+      blurb:'Heavyweight velvet with a matching shawl — built for Lahore\\'s three cold weeks.' },
+    { id:'p6', name:'Rukhsar, bronze silk', fabric:'Raw silk kurti', cat:'silk', price:7300,
+      colors:[{n:'Gold dust',v:'#B48A4A'},{n:'Sage',v:'#5C7C63'},{n:'Rose thread',v:'#8C4B4B'}],
+      sizes:['XS','S','M','L','XL'], sleeveless:true, embroidery:3,
+      blurb:'A shorter, sleeveless kurti in raw silk — pairs with trousers or a lawn dupatta.' }
+  ];
+
+  /* ---------------- Render: hero / float / marquee ---------------- */
+  document.getElementById('heroGarment').innerHTML = garmentSVG({color:'#F1E7D6',ink:'#0E1F17',gold:'#D9BD86',view:'front',embroidery:6});
+  document.getElementById('floatGarment').innerHTML = garmentSVG({color:'#B48A4A',ink:'#241F17',gold:'#12291F',view:'front',embroidery:9});
+
+  var marqueeWords = ['Hand-inked silhouettes','Gold thread, real thread','Lahore atelier, since 2026','Cloth before couture'];
+  var track = document.getElementById('marqueeTrack');
+  (marqueeWords.concat(marqueeWords)).forEach(function(w){
+    var s = document.createElement('span'); s.textContent = w; track.appendChild(s);
+  });
+
+  /* ---------------- Hero: scroll-scrubbed 3D banner (Puma-style) ---------------- */
+  var heroCard = document.getElementById('heroCard');
+  var heroBanner = document.getElementById('heroBanner');
+  var heroInner = document.getElementById('heroInner');
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function onHeroScroll(){
+    if(!heroBanner) return;
+    var h = heroBanner.offsetHeight;
+    var progress = Math.min(Math.max(window.scrollY / h, 0), 1);
+    if(!reduceMotion){
+      var rotY = -18 + progress * 400;
+      var rotX = 6 - progress * 6;
+      var scale = 1 + progress * 0.55;
+      heroCard.style.transform = 'rotateX('+rotX+'deg) rotateY('+rotY+'deg) scale('+scale+')';
+    }
+    var textFade = Math.min(progress * 2.2, 1);
+    heroInner.style.opacity = String(1 - textFade);
+    heroInner.style.transform = 'translateY('+(-textFade*60)+'px)';
+  }
+  window.addEventListener('scroll', onHeroScroll, {passive:true});
+  onHeroScroll();
+
+  /* subtle mouse tilt layered on top, for idle desktop interaction */
+  var heroStage = document.querySelector('.hero-stage');
+  if(!reduceMotion && heroStage){
+    heroStage.addEventListener('mousemove', function(e){
+      if(window.scrollY > heroBanner.offsetHeight*0.3) return;
+      var r = heroStage.getBoundingClientRect();
+      var px = (e.clientX - r.left)/r.width - 0.5;
+      var py = (e.clientY - r.top)/r.height - 0.5;
+      heroCard.style.transform = 'rotateX('+(6 - py*14)+'deg) rotateY('+(-18 + px*26)+'deg) scale(1)';
+    });
+  }
+
+  /* ---------------- Floating product parallax on scroll ---------------- */
+  var floatOrb = document.getElementById('floatOrb');
+  var floatSection = document.querySelector('.float-section');
+  function onScrollFloat(){
+    if(!floatSection || reduceMotion) return;
+    var r = floatSection.getBoundingClientRect();
+    var vh = window.innerHeight;
+    var progress = 1 - Math.min(Math.max((r.top)/(vh*0.9), -1), 1); // -1..2 roughly
+    var rot = (progress-0.5) * 40;
+    var y = (progress-0.5) * -60;
+    floatOrb.style.transform = 'translateY('+y+'px) rotateY('+rot+'deg) rotateX(6deg)';
+  }
+  window.addEventListener('scroll', onScrollFloat, {passive:true});
+  onScrollFloat();
+
+  /* ---------------- 360 spin viewer ---------------- */
+  var spinCube = document.getElementById('spinCube');
+  var spinStage = document.getElementById('spinStage');
+  var spinSvgs = document.querySelectorAll('.spinSvg');
+  var spinViews = ['front','side','back','detail'];
+  spinSvgs.forEach(function(svg, i){
+    svg.innerHTML = garmentSVG({color:'#1E4536', ink:'#241F17', gold:'#B48A4A', view:spinViews[i], embroidery:6});
+  });
+  var currentRotation = 0, dragging = false, lastX = 0;
+  var dots = document.querySelectorAll('.spin-dots i');
+  function updateDots(){
+    var idx = Math.round((((currentRotation % 360)+360)%360)/90) % 4;
+    dots.forEach(function(d,i){ d.classList.toggle('on', i===idx); });
+  }
+  function setRotation(r){ currentRotation = r; spinCube.style.transform = 'rotateY('+r+'deg)'; updateDots(); }
+  function dragStart(x){ dragging = true; lastX = x; spinStage.style.cursor='grabbing'; }
+  function dragMove(x){ if(!dragging) return; var dx = x-lastX; lastX = x; setRotation(currentRotation + dx*0.6); }
+  function dragEnd(){ dragging = false; spinStage.style.cursor='grab'; }
+  spinStage.addEventListener('mousedown', function(e){ dragStart(e.clientX); });
+  window.addEventListener('mousemove', function(e){ dragMove(e.clientX); });
+  window.addEventListener('mouseup', dragEnd);
+  spinStage.addEventListener('touchstart', function(e){ dragStart(e.touches[0].clientX); }, {passive:true});
+  spinStage.addEventListener('touchmove', function(e){ dragMove(e.touches[0].clientX); }, {passive:true});
+  spinStage.addEventListener('touchend', dragEnd);
+  // gentle auto-hint spin on load
+  if(!reduceMotion){ setTimeout(function(){ setRotation(24); setTimeout(function(){ setRotation(0); }, 700); }, 900); }
+
+  /* ---------------- Product grid render + filter ---------------- */
+  var grid = document.getElementById('productGrid');
+  function renderGrid(filter){
+    grid.innerHTML = '';
+    PRODUCTS.filter(function(p){ return filter==='all' || p.cat===filter; }).forEach(function(p){
+      var card = document.createElement('div');
+      card.className = 'pcard';
+      var frontSvg = garmentSVG({color:p.colors[0].v, ink:'#241F17', gold:'#B48A4A', view:'front', sleeveless:p.sleeveless, embroidery:p.embroidery});
+      var swatches = p.colors.map(function(c){ return '<i style="background:'+c.v+'"></i>'; }).join('');
+      card.innerHTML =
+        '<div class="pcard-inner">'+
+          '<div class="pface front">'+
+            '<div class="pface-art">'+svgWrap(frontSvg)+'</div>'+
+            '<div class="pface-meta"><div class="name">'+p.name+'</div><div class="fabric">'+p.fabric+'</div><div class="price">Rs. '+p.price.toLocaleString()+'</div></div>'+
+          '</div>'+
+          '<div class="pface back">'+
+            '<div class="pback-top"><div class="name">'+p.name+'</div><p>'+p.blurb+'</p><div class="swatches">'+swatches+'</div></div>'+
+            '<button class="pback-btn" data-id="'+p.id+'">Select &amp; add</button>'+
+          '</div>'+
+        '</div>';
+      grid.appendChild(card);
+    });
+    grid.querySelectorAll('.pback-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){ openModal(btn.getAttribute('data-id')); });
+    });
+  }
+  renderGrid('all');
+  document.getElementById('filters').addEventListener('click', function(e){
+    var chip = e.target.closest('.chip'); if(!chip) return;
+    document.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('active'); });
+    chip.classList.add('active');
+    renderGrid(chip.getAttribute('data-f'));
+  });
+
+  /* ---------------- Modal ---------------- */
+  var overlay = document.getElementById('modalOverlay');
+  var modalGarment = document.getElementById('modalGarment');
+  var currentProduct = null, selColor = null, selSize = null, qty = 1;
+
+  window.openModal = function(id){
+    currentProduct = PRODUCTS.find(function(p){ return p.id===id; });
+    if(!currentProduct) return;
+    selColor = currentProduct.colors[0];
+    selSize = currentProduct.sizes[Math.min(1,currentProduct.sizes.length-1)];
+    qty = 1;
+    document.getElementById('qtyVal').textContent = qty;
+    document.getElementById('modalName').textContent = currentProduct.name;
+    document.getElementById('modalFabric').textContent = currentProduct.fabric;
+    document.getElementById('modalPrice').textContent = 'Rs. ' + currentProduct.price.toLocaleString();
+
+    var colorRow = document.getElementById('modalColors');
+    colorRow.innerHTML = currentProduct.colors.map(function(c,i){
+      return '<div class="color-dot'+(i===0?' sel':'')+'" style="background:'+c.v+'" data-v="'+c.v+'" data-n="'+c.n+'" title="'+c.n+'"></div>';
+    }).join('');
+    colorRow.querySelectorAll('.color-dot').forEach(function(dot){
+      dot.addEventListener('click', function(){
+        colorRow.querySelectorAll('.color-dot').forEach(function(d){ d.classList.remove('sel'); });
+        dot.classList.add('sel');
+        selColor = { n:dot.getAttribute('data-n'), v:dot.getAttribute('data-v') };
+        renderModalGarment();
+      });
+    });
+
+    var sizeRow = document.getElementById('modalSizes');
+    sizeRow.innerHTML = currentProduct.sizes.map(function(s,i){
+      return '<button class="size-btn'+(s===selSize?' sel':'')+'" data-s="'+s+'">'+s+'</button>';
+    }).join('');
+    sizeRow.querySelectorAll('.size-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        sizeRow.querySelectorAll('.size-btn').forEach(function(b){ b.classList.remove('sel'); });
+        btn.classList.add('sel');
+        selSize = btn.getAttribute('data-s');
+      });
+    });
+
+    renderModalGarment();
+    overlay.classList.add('open');
+  };
+  function renderModalGarment(){
+    modalGarment.innerHTML = garmentSVG({color:selColor.v, ink:'#241F17', gold:'#B48A4A', view:'front', sleeveless:currentProduct.sleeveless, embroidery:currentProduct.embroidery});
+  }
+  document.getElementById('modalClose').addEventListener('click', function(){ overlay.classList.remove('open'); });
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.classList.remove('open'); });
+  document.getElementById('qtyMinus').addEventListener('click', function(){ qty = Math.max(1, qty-1); document.getElementById('qtyVal').textContent = qty; });
+  document.getElementById('qtyPlus').addEventListener('click', function(){ qty = qty+1; document.getElementById('qtyVal').textContent = qty; });
+  document.getElementById('modalAddBtn').addEventListener('click', function(){
+    addToCart(currentProduct, selColor, selSize, qty);
+    overlay.classList.remove('open');
+    openCart();
+  });
+
+  /* ---------------- Cart (persisted per-viewer via localStorage) ---------------- */
+  var CART_KEY = 'resham_cart_v1';
+  var cart = [];
+  try {
+    var raw = localStorage.getItem(CART_KEY);
+    if(raw) cart = JSON.parse(raw);
+  } catch(e){ cart = []; }
+
+  function saveCart(){
+    try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch(e){ /* storage unavailable; cart still works in-memory */ }
+  }
+  function addToCart(product, color, size, quantity){
+    var existing = cart.find(function(c){ return c.id===product.id && c.color===color.n && c.size===size; });
+    if(existing){ existing.qty += quantity; }
+    else{
+      cart.push({ id:product.id, name:product.name, price:product.price, color:color.n, colorHex:color.v, size:size, qty:quantity, sleeveless:product.sleeveless, embroidery:product.embroidery });
+    }
+    saveCart(); renderCart();
+  }
+  function removeFromCart(idx){ cart.splice(idx,1); saveCart(); renderCart(); }
+  function changeQty(idx, delta){
+    cart[idx].qty += delta;
+    if(cart[idx].qty <= 0) cart.splice(idx,1);
+    saveCart(); renderCart();
+  }
+
+  var drawer = document.getElementById('cartDrawer');
+  var drawerOverlay = document.getElementById('drawerOverlay');
+  var drawerBody = document.getElementById('drawerBody');
+  var cartCountEl = document.getElementById('cartCount');
+  var subtotalEl = document.getElementById('subtotalVal');
+
+  function renderCart(){
+    var totalQty = cart.reduce(function(s,c){ return s+c.qty; }, 0);
+    cartCountEl.textContent = totalQty;
+    if(cart.length === 0){
+      drawerBody.innerHTML = '<div class="empty-cart">'+
+        svgWrap(garmentSVG({color:'#B48A4A', ink:'#241F17', gold:'#1E4536', view:'front'}))+
+        '<div>Your cart is empty — the atelier awaits.</div></div>';
+    } else {
+      drawerBody.innerHTML = cart.map(function(c, i){
+        return '<div class="cart-item">'+
+          svgWrap(garmentSVG({color:c.colorHex, ink:'#241F17', gold:'#B48A4A', view:'front', sleeveless:c.sleeveless, embroidery:c.embroidery}))+
+          '<div style="flex:1;">'+
+            '<div class="ci-name">'+c.name+'</div>'+
+            '<div class="ci-meta">'+c.color+' · Size '+c.size+' · Rs. '+c.price.toLocaleString()+'</div>'+
+            '<div class="ci-controls">'+
+              '<button data-act="minus" data-i="'+i+'">−</button><span>'+c.qty+'</span><button data-act="plus" data-i="'+i+'">+</button>'+
+              '<button class="ci-remove" data-act="remove" data-i="'+i+'">Remove</button>'+
+            '</div>'+
+          '</div>'+
+        '</div>';
+      }).join('');
+    }
+    var subtotal = cart.reduce(function(s,c){ return s + c.price*c.qty; }, 0);
+    subtotalEl.textContent = 'Rs. ' + subtotal.toLocaleString();
+
+    drawerBody.querySelectorAll('button[data-act]').forEach(function(btn){
+      var i = parseInt(btn.getAttribute('data-i'),10);
+      var act = btn.getAttribute('data-act');
+      btn.addEventListener('click', function(){
+        if(act==='plus') changeQty(i, 1);
+        if(act==='minus') changeQty(i, -1);
+        if(act==='remove') removeFromCart(i);
+      });
+    });
+  }
+  renderCart();
+
+  window.openCart = function(){ drawer.classList.add('open'); drawerOverlay.classList.add('open'); };
+  function closeCart(){ drawer.classList.remove('open'); drawerOverlay.classList.remove('open'); }
+  document.getElementById('cartOpenBtn').addEventListener('click', openCart);
+  document.getElementById('drawerClose').addEventListener('click', closeCart);
+  drawerOverlay.addEventListener('click', closeCart);
+
+  document.getElementById('checkoutBtn').addEventListener('click', function(){
+    if(cart.length===0) return;
+    var lines = cart.map(function(c){ return '- '+c.name+' ('+c.color+', size '+c.size+') x'+c.qty+' = Rs. '+(c.price*c.qty).toLocaleString(); });
+    var subtotal = cart.reduce(function(s,c){ return s + c.price*c.qty; }, 0);
+    var msg = 'Assalam-o-Alaikum RESHAM, I would like to order:\n' + lines.join('\n') + '\n\nSubtotal: Rs. ' + subtotal.toLocaleString();
+    var url = 'https://wa.me/920000000000?text=' + encodeURIComponent(msg);
+    window.open(url, '_blank');
+  });
+
+})();
+</script>
+</body>
+</html>
