@@ -136,7 +136,7 @@
   }
   .hero-card .face.back{ transform: rotateY(180deg) translateZ(0); background:var(--emerald); }
   .hero-card .face.edge{ width:24px; left:auto; right:-24px; transform: rotateY(90deg) translateZ(12px); background:var(--emerald-deep); border-radius:0 14px 14px 0;}
-  .hero-card svg{ width:78%; }
+  .hero-card img{ width:100%; height:100%; object-fit:cover; border-radius:14px; }
   .hero-tag{ position:absolute; bottom:-18px; left:-18px; background:var(--paper); border:1px solid var(--line);
     border-radius:12px; padding:10px 14px; font-size:12px; transform:translateZ(60px); box-shadow:0 12px 24px rgba(0,0,0,.3);}
   .hero-tag b{ display:block; font-family:'Fraunces'; font-size:15px; }
@@ -201,7 +201,7 @@
   @media (max-width:860px){ .float-grid{ grid-template-columns:1fr; } }
   .float-visual{ height:460px; position:relative; }
   .float-orb{ position:absolute; inset:0; margin:auto; width:340px; height:420px; will-change:transform; }
-  .float-orb svg{ width:100%; height:100%; }
+  .float-orb img{ width:100%; height:100%; object-fit:cover; border-radius:20px; }
   .float-text .kicker{ font-size:13px; letter-spacing:.03em; color:var(--gold); font-family:'Manrope'; font-weight:700; }
   :root[data-theme="dark"] .float-text .kicker{ color:var(--gold-light); }
   .float-text h2{ font-size:clamp(28px,3.4vw,42px); margin-top:10px; max-width:12ch; }
@@ -219,7 +219,8 @@
   .spin-cube{ width:250px; height:360px; position:relative; transform-style:preserve-3d; transform: rotateY(0deg); }
   .spin-face{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:var(--card);
     border:1px solid var(--line); border-radius:12px; backface-visibility:hidden; }
-  .spin-face svg{ width:70%; }
+  .spin-face img{ width:100%; height:100%; object-fit:cover; }
+  .spin-face.f3 img{ object-position:top center; }
   .spin-face.f0{ transform: rotateY(0deg) translateZ(125px); }
   .spin-face.f1{ transform: rotateY(90deg) translateZ(125px); }
   .spin-face.f2{ transform: rotateY(180deg) translateZ(125px); }
@@ -385,7 +386,7 @@
     <div class="hero-stage">
       <div class="hero-card" id="heroCard">
         <div class="face front">
-          <svg viewBox="0 0 200 280" id="heroGarment"></svg>
+          <img id="heroGarment" src="p1-zoya.jpg" alt="Zoya Kurta">
         </div>
         <div class="face back"></div>
         <div class="face edge"></div>
@@ -430,7 +431,7 @@
   <div class="wrap float-grid">
     <div class="float-visual">
       <div class="float-orb" id="floatOrb">
-        <svg viewBox="0 0 200 280" id="floatGarment"></svg>
+        <img id="floatGarment" src="p2-anaya.jpg" alt="Anaya, old gold">
       </div>
     </div>
     <div class="float-text">
@@ -458,10 +459,10 @@
     <div>
       <div class="spin-stage" id="spinStage">
         <div class="spin-cube" id="spinCube">
-          <div class="spin-face f0"><svg viewBox="0 0 200 280" class="spinSvg" data-angle="front"></svg></div>
-          <div class="spin-face f1"><svg viewBox="0 0 200 280" class="spinSvg" data-angle="side"></svg></div>
-          <div class="spin-face f2"><svg viewBox="0 0 200 280" class="spinSvg" data-angle="back"></svg></div>
-          <div class="spin-face f3"><svg viewBox="0 0 200 280" class="spinSvg" data-angle="detail"></svg></div>
+          <div class="spin-face f0"><img class="spinSvg" data-angle="front" src="p2-anaya-front.jpg" alt="Anaya, old gold — front"></div>
+          <div class="spin-face f1"><img class="spinSvg" data-angle="side" src="p2-anaya-side.jpg" alt="Anaya, old gold — side"></div>
+          <div class="spin-face f2"><img class="spinSvg" data-angle="back" src="p2-anaya-back.jpg" alt="Anaya, old gold — back"></div>
+          <div class="spin-face f3"><img class="spinSvg" data-angle="detail" src="p2-anaya-detail.jpg" alt="Anaya, old gold — detail"></div>
         </div>
       </div>
       <p class="spin-hint">Drag left or right to rotate</p>
@@ -696,9 +697,6 @@
   };
 
   /* ---------------- Render: hero / float / marquee ---------------- */
-  document.getElementById('heroGarment').innerHTML = garmentSVG({color:'#F1E7D6',ink:'#0E1F17',gold:'#D9BD86',view:'front',embroidery:6});
-  document.getElementById('floatGarment').innerHTML = garmentSVG({color:'#B48A4A',ink:'#241F17',gold:'#12291F',view:'front',embroidery:9});
-
   var marqueeWords = ['Hand-inked silhouettes','Gold thread, real thread','Lahore atelier, since 2026','Cloth before couture'];
   var track = document.getElementById('marqueeTrack');
   (marqueeWords.concat(marqueeWords)).forEach(function(w){
@@ -760,9 +758,6 @@
   var spinStage = document.getElementById('spinStage');
   var spinSvgs = document.querySelectorAll('.spinSvg');
   var spinViews = ['front','side','back','detail'];
-  spinSvgs.forEach(function(svg, i){
-    svg.innerHTML = garmentSVG({color:'#1E4536', ink:'#241F17', gold:'#B48A4A', view:spinViews[i], embroidery:6});
-  });
   var currentRotation = 0, dragging = false, lastX = 0;
   var dots = document.querySelectorAll('.spin-dots i');
   function updateDots(){
