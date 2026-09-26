@@ -556,7 +556,7 @@
         <div>
           <h4>Order</h4>
           <a href="#" onclick="openCart(); return false;">Your cart</a>
-          <a href="https://wa.me/920000000000" target="_blank" rel="noopener">WhatsApp us</a>
+          <a href="https://wa.me/923342667723" target="_blank" rel="noopener">WhatsApp us</a>
         </div>
       </div>
     </div>
@@ -940,7 +940,7 @@
     var lines = cart.map(function(c){ return '- '+c.name+' ('+c.color+', size '+c.size+') x'+c.qty+' = Rs. '+(c.price*c.qty).toLocaleString(); });
     var subtotal = cart.reduce(function(s,c){ return s + c.price*c.qty; }, 0);
     var msg = 'Assalam-o-Alaikum RESHAM, I would like to order:\n' + lines.join('\n') + '\n\nSubtotal: Rs. ' + subtotal.toLocaleString();
-    var url = 'https://wa.me/920000000000?text=' + encodeURIComponent(msg);
+    var url = 'https://wa.me/923342667723?text=' + encodeURIComponent(msg);
     window.open(url, '_blank');
   });
 
