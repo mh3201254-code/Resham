@@ -89,7 +89,12 @@
     background: radial-gradient(120% 90% at 50% 20%, #16352A 0%, #12291F 45%, #0B1712 100%);
     display:flex; align-items:center; justify-content:center;
   }
-  .hero-grain{ position:absolute; inset:0; opacity:0.5; mix-blend-mode:overlay;
+  .hero-video-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+    filter:saturate(1.05) brightness(0.85); z-index:0; }
+  .hero-video-overlay{ position:absolute; inset:0; z-index:1;
+    background: radial-gradient(120% 90% at 50% 20%, rgba(22,53,42,0.55) 0%, rgba(18,41,31,0.68) 45%, rgba(11,23,18,0.88) 100%); }
+  @media (prefers-reduced-motion: reduce){ .hero-video-bg{ display:none; } }
+  .hero-grain{ position:absolute; inset:0; opacity:0.5; mix-blend-mode:overlay; z-index:1;
     background-image: radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.5) 0, transparent 60%),
                        radial-gradient(1px 1px at 70% 60%, rgba(255,255,255,.35) 0, transparent 60%),
                        radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,.3) 0, transparent 60%);
@@ -356,6 +361,10 @@
 
 <!-- ================= HERO (cinematic 3D scroll banner) ================= -->
 <section class="hero" id="heroBanner">
+  <video class="hero-video-bg" autoplay muted loop playsinline aria-hidden="true">
+    <source src="hero-video.mp4" type="video/mp4">
+  </video>
+  <div class="hero-video-overlay"></div>
   <div class="hero-grain"></div>
   <div class="hero-beam b1"></div>
   <div class="hero-beam b2"></div>
