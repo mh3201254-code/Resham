@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RESHAM Atelier — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --emerald:#1E4536; --ink:#241F17; --ink-soft:#6b6255; --paper:#F7F1E4;
+    --card:#FFFFFF; --line:#E6DCC6; --gold:#B48A4A; --danger:#B3261E;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:'Inter',sans-serif; background:var(--paper); color:var(--ink);
+    min-height:100vh; display:flex; flex-direction:column; }
+  header{ padding:18px 28px; border-bottom:1px solid var(--line); display:flex;
+    align-items:center; justify-content:space-between; background:var(--card); }
+  .brand{ font-family:'Fraunces',serif; font-size:20px; }
+  .brand b{ color:var(--emerald); }
+  #logoutBtn{ display:none; background:none; border:1px solid var(--line); border-radius:8px;
+    padding:8px 16px; cursor:pointer; font-family:'Inter',sans-serif; font-size:14px; }
+
+  .wrap{ flex:1; display:flex; align-items:center; justify-content:center; padding:24px; }
+
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:36px; width:100%; max-width:380px; }
+  .card h1{ font-family:'Fraunces',serif; font-size:24px; margin:0 0 6px; }
+  .card p.sub{ color:var(--ink-soft); font-size:14px; margin:0 0 24px; }
+
+  label{ display:block; font-size:13px; color:var(--ink-soft); margin:14px 0 6px; }
+  input{ width:100%; padding:11px 13px; border:1px solid var(--line); border-radius:9px;
+    font-size:15px; font-family:'Inter',sans-serif; background:#FCFAF4; }
+  input:focus{ outline:2px solid var(--emerald); outline-offset:1px; }
+
+  button.primary{ width:100%; margin-top:22px; padding:12px; border:none; border-radius:9px;
+    background:var(--emerald); color:#fff; font-size:15px; font-weight:600; cursor:pointer; }
+  button.primary:disabled{ opacity:.6; cursor:default; }
+  button.primary:hover:not(:disabled){ background:#163326; }
+
+  .link-row{ text-align:center; margin-top:16px; }
+  .link-row a{ color:var(--emerald); font-size:13px; text-decoration:underline; cursor:pointer; }
+
+  .msg{ font-size:13px; border-radius:8px; padding:10px 12px; margin-top:14px; display:none; }
+  .msg.error{ background:#FBEAE9; color:var(--danger); display:block; }
+  .msg.success{ background:#E9F3ED; color:var(--emerald); display:block; }
+
+  #dashboard{ display:none; padding:40px 28px; max-width:960px; margin:0 auto; width:100%; }
+  #dashboard h1{ font-family:'Fraunces',serif; font-size:28px; margin:0 0 6px; }
+  #dashboard p{ color:var(--ink-soft); }
+  .stat-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px; margin-top:28px; }
+  .stat{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px; }
+  .stat b{ font-family:'Fraunces',serif; font-size:26px; display:block; color:var(--emerald); }
+  .stat span{ font-size:13px; color:var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand"><b>RESHAM</b> admin</div>
+  <button id="logoutBtn">Log out</button>
+</header>
+
+<div class="wrap" id="authWrap">
+
+  <!-- LOGIN CARD -->
+  <div class="card" id="loginCard">
+    <h1>Admin Login</h1>
+    <p class="sub">Sign in to manage RESHAM Atelier.</p>
+    <div id="loginMsg" class="msg"></div>
+    <label for="loginEmail">Email</label>
+    <input type="email" id="loginEmail" autocomplete="username" placeholder="you@example.com">
+    <label for="loginPassword">Password</label>
+    <input type="password" id="loginPassword" autocomplete="current-password" placeholder="••••••••">
+    <button class="primary" id="loginBtn">Sign in</button>
+    <div class="link-row"><a id="showForgot">Forgot password?</a></div>
+  </div>
+
+  <!-- FORGOT PASSWORD CARD -->
+  <div class="card" id="forgotCard" style="display:none;">
+    <h1>Reset password</h1>
+    <p class="sub">We'll email you a reset link.</p>
+    <div id="forgotMsg" class="msg"></div>
+    <label for="forgotEmail">Email</label>
+    <input type="email" id="forgotEmail" placeholder="you@example.com">
+    <button class="primary" id="forgotBtn">Send reset link</button>
+    <div class="link-row"><a id="backToLogin">Back to login</a></div>
+  </div>
+
+  <!-- SET NEW PASSWORD CARD (shown when user opens reset link from email) -->
+  <div class="card" id="resetCard" style="display:none;">
+    <h1>Set new password</h1>
+    <p class="sub">Choose a new password for your account.</p>
+    <div id="resetMsg" class="msg"></div>
+    <label for="newPassword">New password</label>
+    <input type="password" id="newPassword" placeholder="••••••••">
+    <button class="primary" id="resetBtn">Update password</button>
+  </div>
+
+</div>
+
+<!-- DASHBOARD SHELL (Priority 3 will fill this in) -->
+<div id="dashboard">
+  <h1>Welcome back</h1>
+  <p>You're securely logged in as <b id="userEmail"></b>. Product &amp; order management will appear here next.</p>
+  <div class="stat-grid">
+    <div class="stat"><b>—</b><span>Total Products</span></div>
+    <div class="stat"><b>—</b><span>New Orders</span></div>
+    <div class="stat"><b>—</b><span>Total Customers</span></div>
+    <div class="stat"><b>—</b><span>Out of Stock</span></div>
+  </div>
+</div>
+
+<script>
+  // ---- Supabase config (safe to expose — protected by Row Level Security) ----
+  const SUPABASE_URL = 'https://xpleohaflxzvxqihnenw.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_ty1zSKS0Dp8wbGpaEzSlEQ_tbBX2tIw';
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const $ = (id) => document.getElementById(id);
+  const loginCard = $('loginCard'), forgotCard = $('forgotCard'), resetCard = $('resetCard');
+  const authWrap = $('authWrap'), dashboard = $('dashboard'), logoutBtn = $('logoutBtn');
+
+  function showMsg(el, text, type){
+    el.textContent = text;
+    el.className = 'msg ' + type;
+  }
+
+  function showDashboard(session){
+    authWrap.style.display = 'none';
+    dashboard.style.display = 'block';
+    logoutBtn.style.display = 'inline-block';
+    $('userEmail').textContent = session.user.email;
+  }
+
+  function showLogin(){
+    authWrap.style.display = 'flex';
+    dashboard.style.display = 'none';
+    logoutBtn.style.display = 'none';
+    loginCard.style.display = 'block';
+    forgotCard.style.display = 'none';
+    resetCard.style.display = 'none';
+  }
+
+  // ---- Initial session check ----
+  sb.auth.getSession().then(({ data: { session } }) => {
+    if (session) showDashboard(session); else showLogin();
+  });
+
+  // ---- React to auth changes (login, logout, password recovery link) ----
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      authWrap.style.display = 'flex';
+      loginCard.style.display = 'none';
+      forgotCard.style.display = 'none';
+      resetCard.style.display = 'block';
+    } else if (event === 'SIGNED_IN' && session) {
+      showDashboard(session);
+    } else if (event === 'SIGNED_OUT') {
+      showLogin();
+    }
+  });
+
+  // ---- Login ----
+  $('loginBtn').addEventListener('click', async () => {
+    const email = $('loginEmail').value.trim();
+    const password = $('loginPassword').value;
+    if (!email || !password) return showMsg($('loginMsg'), 'Please enter email and password.', 'error');
+    $('loginBtn').disabled = true;
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    $('loginBtn').disabled = false;
+    if (error) return showMsg($('loginMsg'), error.message, 'error');
+    showDashboard(data.session);
+  });
+
+  // ---- Logout ----
+  logoutBtn.addEventListener('click', async () => {
+    await sb.auth.signOut();
+  });
+
+  // ---- Forgot password flow ----
+  $('showForgot').addEventListener('click', () => {
+    loginCard.style.display = 'none';
+    forgotCard.style.display = 'block';
+  });
+  $('backToLogin').addEventListener('click', () => {
+    forgotCard.style.display = 'none';
+    loginCard.style.display = 'block';
+  });
+  $('forgotBtn').addEventListener('click', async () => {
+    const email = $('forgotEmail').value.trim();
+    if (!email) return showMsg($('forgotMsg'), 'Please enter your email.', 'error');
+    $('forgotBtn').disabled = true;
+    const { error } = await sb.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + window.location.pathname
+    });
+    $('forgotBtn').disabled = false;
+    if (error) return showMsg($('forgotMsg'), error.message, 'error');
+    showMsg($('forgotMsg'), 'Reset link sent — check your email.', 'success');
+  });
+
+  // ---- Set new password (after clicking email link) ----
+  $('resetBtn').addEventListener('click', async () => {
+    const newPassword = $('newPassword').value;
+    if (!newPassword || newPassword.length < 6) {
+      return showMsg($('resetMsg'), 'Password must be at least 6 characters.', 'error');
+    }
+    $('resetBtn').disabled = true;
+    const { error } = await sb.auth.updateUser({ password: newPassword });
+    $('resetBtn').disabled = false;
+    if (error) return showMsg($('resetMsg'), error.message, 'error');
+    showMsg($('resetMsg'), 'Password updated! Redirecting…', 'success');
+    setTimeout(() => location.reload(), 1500);
+  });
+</script>
+</body>
+</html>
