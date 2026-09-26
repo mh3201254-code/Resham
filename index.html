@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RESHAM — Atelier 2026</title>
+<title>RESHAM — Atelier 2026 | Pakistani Women's Lawn, Silk & Chiffon</title>
+<meta name="description" content="RESHAM Atelier — hand-inked Pakistani womenswear. Lawn, silk, chiffon &amp; velvet pret, cash on delivery across Pakistan, order on WhatsApp.">
+<meta property="og:title" content="RESHAM — Atelier 2026">
+<meta property="og:description" content="Hand-inked Pakistani womenswear. Lawn, silk, chiffon &amp; velvet pret, cash on delivery across Pakistan.">
+<meta property="og:type" content="website">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,450;0,9..144,600;1,9..144,450&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -145,6 +149,47 @@
   .marquee-track span:after{ content:'—'; margin-left:48px; color:var(--gold); font-style:normal; }
   @keyframes scrollLeft{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
 
+  /* ---------- Trust strip ---------- */
+  .trust-strip{ border-bottom:1px solid var(--line); }
+  .trust-strip .wrap{ display:grid; grid-template-columns:repeat(4,1fr); gap:20px; padding:26px 28px; }
+  @media (max-width:760px){ .trust-strip .wrap{ grid-template-columns:repeat(2,1fr); } }
+  .trust-item{ display:flex; align-items:center; gap:12px; }
+  .trust-item svg{ width:26px; height:26px; flex:none; color:var(--emerald); }
+  :root[data-theme="dark"] .trust-item svg{ color:var(--gold-light); }
+  .trust-item div b{ display:block; font-family:'Fraunces'; font-size:14px; }
+  .trust-item div span{ display:block; font-size:12px; color:var(--ink-soft); }
+
+  /* ---------- Badges on product cards ---------- */
+  .pbadge{ position:absolute; top:14px; left:14px; z-index:2; background:var(--gold); color:var(--emerald-deep);
+    font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; padding:5px 10px; border-radius:999px; }
+
+  /* ---------- Testimonials ---------- */
+  .testimonials{ padding:90px 0; background:var(--paper-2); }
+  .testimonials .wrap > .kicker{ font-size:13px; font-weight:700; color:var(--gold); }
+  :root[data-theme="dark"] .testimonials .kicker{ color:var(--gold-light); }
+  .testimonials h2{ font-size:clamp(26px,3vw,36px); margin-top:8px; margin-bottom:36px; max-width:14ch; }
+  .t-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; }
+  @media (max-width:860px){ .t-grid{ grid-template-columns:1fr; } }
+  .t-card{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:26px; }
+  .t-stars{ color:var(--gold); letter-spacing:2px; font-size:14px; }
+  .t-card p{ margin-top:14px; font-size:14px; line-height:1.6; color:var(--ink-soft); }
+  .t-name{ margin-top:18px; font-family:'Fraunces'; font-size:14px; }
+  .t-name span{ display:block; font-family:'Manrope'; font-size:12px; color:var(--ink-soft); font-weight:400; }
+
+  /* ---------- FAQ ---------- */
+  .faq{ padding:90px 0; }
+  .faq h2{ font-size:clamp(26px,3vw,36px); margin-bottom:30px; max-width:12ch; }
+  .faq-item{ border-top:1px dashed var(--line); }
+  .faq-item:last-child{ border-bottom:1px dashed var(--line); }
+  .faq-q{ width:100%; text-align:left; background:none; border:none; padding:20px 4px; font-family:'Fraunces';
+    font-size:17px; display:flex; justify-content:space-between; align-items:center; cursor:pointer; color:var(--ink); }
+  .faq-q .plus{ font-size:20px; color:var(--gold); transition:transform .25s ease; flex:none; margin-left:16px; }
+  :root[data-theme="dark"] .faq-q .plus{ color:var(--gold-light); }
+  .faq-item.open .plus{ transform:rotate(45deg); }
+  .faq-a{ max-height:0; overflow:hidden; transition:max-height .3s ease; }
+  .faq-item.open .faq-a{ max-height:200px; }
+  .faq-a p{ padding:0 4px 20px; color:var(--ink-soft); font-size:14px; line-height:1.6; max-width:60ch; }
+
   /* ---------- Floating product / parallax ---------- */
   .float-section{ padding:110px 0; position:relative; }
   .float-grid{ display:grid; grid-template-columns:1fr 1fr; gap:60px; align-items:center;}
@@ -209,7 +254,7 @@
   @media (max-width:900px){ .grid{ grid-template-columns:repeat(2,1fr); } }
   @media (max-width:560px){ .grid{ grid-template-columns:1fr; } }
 
-  .pcard{ perspective:1200px; }
+  .pcard{ perspective:1200px; position:relative; }
   .pcard-inner{ position:relative; width:100%; height:380px; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.2,.8,.2,1); }
   .pcard:hover .pcard-inner, .pcard:focus-within .pcard-inner{ transform: rotateY(180deg); }
   .pface{ position:absolute; inset:0; border-radius:16px; backface-visibility:hidden; border:1px solid var(--line); overflow:hidden;
@@ -349,6 +394,27 @@
   <div class="marquee-track" id="marqueeTrack"></div>
 </div>
 
+<section class="trust-strip">
+  <div class="wrap">
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M2 11h20M7 15h4"/></svg>
+      <div><b>Cash on Delivery</b><span>Anywhere in Pakistan</span></div>
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h13l4 4v6h-3M3 7v10h3M16 7v10"/><circle cx="7.5" cy="17.5" r="1.7"/><circle cx="16.5" cy="17.5" r="1.7"/></svg>
+      <div><b>2–5 Day Delivery</b><span>Karachi, Lahore, Islamabad &amp; more</span></div>
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></svg>
+      <div><b>Easy Exchange</b><span>Within 3 days of delivery</span></div>
+    </div>
+    <div class="trust-item">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.5 4.5a11 11 0 0 1-16 16M4.5 4.5l15 15"/><path d="M12 8v4l2.5 2.5"/></svg>
+      <div><b>WhatsApp Support</b><span>Real answers, no bots</span></div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= FLOATING PRODUCT ================= -->
 <section class="float-section">
   <div class="wrap float-grid">
@@ -423,6 +489,54 @@
       </div>
     </div>
     <div class="grid" id="productGrid"></div>
+  </div>
+</section>
+
+<section class="testimonials">
+  <div class="wrap">
+    <div class="kicker">From the atelier's customers</div>
+    <h2>What Pakistan is saying</h2>
+    <div class="t-grid">
+      <div class="t-card">
+        <div class="t-stars">★★★★★</div>
+        <p>"Ordered the Meher lawn set for Eid — fabric felt exactly like the description, and it reached Karachi in 3 days. Will order again."</p>
+        <div class="t-name">Areeba K. <span>Karachi</span></div>
+      </div>
+      <div class="t-card">
+        <div class="t-stars">★★★★★</div>
+        <p>"The Anaya piece is even better in person — tilla work is proper handwork, not printed. Got so many compliments at the walima."</p>
+        <div class="t-name">Sana M. <span>Lahore</span></div>
+      </div>
+      <div class="t-card">
+        <div class="t-stars">★★★★☆</div>
+        <p>"Sizing was true to the chart. Only wish there were more colour options for the velvet set, but overall very happy with the stitching."</p>
+        <div class="t-name">Hira A. <span>Islamabad</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="wrap">
+    <h2>Before you order</h2>
+    <div id="faqList">
+      <div class="faq-item">
+        <button class="faq-q"><span>How long does delivery take?</span><span class="plus">+</span></button>
+        <div class="faq-a"><p>2–3 working days within Lahore, Karachi and Islamabad, and 3–5 days for the rest of Pakistan. You'll get a tracking update on WhatsApp once your order ships.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span>Is Cash on Delivery available?</span><span class="plus">+</span></button>
+        <div class="faq-a"><p>Yes, COD is available across Pakistan. Advance bank transfer is also accepted if you'd prefer a discount on select pieces.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span>What if the size doesn't fit?</span><span class="plus">+</span></button>
+        <div class="faq-a"><p>We offer a free exchange within 3 days of delivery, as long as the piece is unworn with tags attached. Message us on WhatsApp to arrange it.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q"><span>Do you offer custom stitching?</span><span class="plus">+</span></button>
+        <div class="faq-a"><p>Yes — send your measurements on WhatsApp after ordering and our tailors will stitch to size at no extra cost on most pieces.</p></div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -540,11 +654,11 @@
 
   /* ---------------- Product data ---------------- */
   var PRODUCTS = [
-    { id:'p1', name:'Zoya Kurta', fabric:'Hand-block emerald silk', cat:'silk', price:8500,
+    { id:'p1', name:'Zoya Kurta', fabric:'Hand-block emerald silk', cat:'silk', price:8500, badge:'Bestseller',
       colors:[{n:'Emerald',v:'#1E4536'},{n:'Ink',v:'#241F17'},{n:'Rose thread',v:'#8C4B4B'}],
       sizes:['XS','S','M','L','XL'], sleeveless:false, embroidery:6,
       blurb:'Hand-block printed silk, finished with a single line of running gold thread at the hem.' },
-    { id:'p2', name:'Anaya, old gold', fabric:'Tilla-worked chiffon', cat:'chiffon', price:12900,
+    { id:'p2', name:'Anaya, old gold', fabric:'Tilla-worked chiffon', cat:'chiffon', price:12900, badge:'Signature',
       colors:[{n:'Gold dust',v:'#B48A4A'},{n:'Deep emerald',v:'#12291F'},{n:'Ivory',v:'#E6DAC0'}],
       sizes:['S','M','L','XL'], sleeveless:false, embroidery:9,
       blurb:'Our signature piece — tilla embroidery worked entirely by hand along the neckline.' },
@@ -552,7 +666,7 @@
       colors:[{n:'Ivory',v:'#E6DAC0'},{n:'Sage',v:'#5C7C63'},{n:'Ink',v:'#241F17'}],
       sizes:['XS','S','M','L'], sleeveless:true, embroidery:4,
       blurb:'Light summer lawn, sleeveless cut, a quiet dupatta drape for everyday wear.' },
-    { id:'p4', name:'Sana, rose organza', fabric:'Layered organza gown', cat:'chiffon', price:15900,
+    { id:'p4', name:'Sana, rose organza', fabric:'Layered organza gown', cat:'chiffon', price:15900, badge:'New',
       colors:[{n:'Rose thread',v:'#8C4B4B'},{n:'Gold dust',v:'#B48A4A'},{n:'Ink',v:'#241F17'}],
       sizes:['S','M','L'], sleeveless:false, embroidery:8,
       blurb:'Full-length organza, cut for evening — the dupatta pools rather than falls.' },
@@ -662,7 +776,9 @@
       card.className = 'pcard';
       var frontSvg = garmentSVG({color:p.colors[0].v, ink:'#241F17', gold:'#B48A4A', view:'front', sleeveless:p.sleeveless, embroidery:p.embroidery});
       var swatches = p.colors.map(function(c){ return '<i style="background:'+c.v+'"></i>'; }).join('');
+      card.style.position = 'relative';
       card.innerHTML =
+        (p.badge ? '<div class="pbadge">'+p.badge+'</div>' : '') +
         '<div class="pcard-inner">'+
           '<div class="pface front">'+
             '<div class="pface-art">'+svgWrap(frontSvg)+'</div>'+
@@ -826,6 +942,16 @@
     var msg = 'Assalam-o-Alaikum RESHAM, I would like to order:\n' + lines.join('\n') + '\n\nSubtotal: Rs. ' + subtotal.toLocaleString();
     var url = 'https://wa.me/920000000000?text=' + encodeURIComponent(msg);
     window.open(url, '_blank');
+  });
+
+  /* ---------------- FAQ accordion ---------------- */
+  document.querySelectorAll('.faq-q').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var item = btn.closest('.faq-item');
+      var wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item.open').forEach(function(i){ i.classList.remove('open'); });
+      if(!wasOpen) item.classList.add('open');
+    });
   });
 
 })();
