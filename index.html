@@ -266,8 +266,8 @@
     display:flex; flex-direction:column; }
   .pface.front{ background:var(--card); }
   .pface.back{ background:var(--emerald); color:#F1E7D6; transform:rotateY(180deg); padding:24px; justify-content:space-between; }
-  .pface-art{ flex:1; display:flex; align-items:center; justify-content:center; }
-  .pface-art svg{ width:62%; }
+  .pface-art{ flex:1; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+  .pface-art img{ width:100%; height:100%; object-fit:cover; object-position:top center; display:block; }
   .pface-meta{ padding:14px 18px 18px; border-top:1px dashed var(--line); }
   .pface-meta .name{ font-family:'Fraunces'; font-size:17px; }
   .pface-meta .fabric{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
@@ -288,7 +288,7 @@
     display:grid; grid-template-columns:1fr 1fr; border:1px solid var(--line); }
   @media (max-width:640px){ .modal{ grid-template-columns:1fr; } }
   .modal-art{ background:var(--card); display:flex; align-items:center; justify-content:center; padding:30px; position:relative; }
-  .modal-art svg{ width:70%; transition: filter .2s ease; }
+  .modal-art img{ width:100%; height:100%; object-fit:cover; position:absolute; inset:0; }
   .modal-close{ position:absolute; top:14px; right:14px; border:none; background:transparent; font-size:20px; cursor:pointer; color:var(--ink); }
   .modal-info{ padding:30px 28px; }
   .modal-info .name{ font-size:24px; }
@@ -318,6 +318,7 @@
   .drawer-body{ flex:1; overflow:auto; padding:18px 24px; }
   .cart-item{ display:flex; gap:14px; padding:14px 0; border-bottom:1px dashed var(--line); }
   .cart-item svg{ width:52px; height:64px; flex:none; }
+  .cart-item img{ width:52px; height:64px; flex:none; object-fit:cover; border-radius:8px; }
   .ci-name{ font-family:'Fraunces'; font-size:15px; }
   .ci-meta{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
   .ci-controls{ display:flex; align-items:center; gap:10px; margin-top:8px; }
@@ -582,7 +583,7 @@
   <div class="modal">
     <div class="modal-art">
       <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
-      <svg viewBox="0 0 200 280" id="modalGarment"></svg>
+      <img id="modalGarment" alt="">
     </div>
     <div class="modal-info">
       <div class="name" id="modalName"></div>
@@ -689,6 +690,11 @@
       blurb:'A shorter, sleeveless kurti in raw silk — pairs with trousers or a lawn dupatta.' }
   ];
 
+  var PRODUCT_IMAGES = {
+    p1:'p1-zoya.jpg', p2:'p2-anaya.jpg', p3:'p3-meher.jpg',
+    p4:'p4-sana.jpg', p5:'p5-alina.jpg', p6:'p6-rukhsar.jpg'
+  };
+
   /* ---------------- Render: hero / float / marquee ---------------- */
   document.getElementById('heroGarment').innerHTML = garmentSVG({color:'#F1E7D6',ink:'#0E1F17',gold:'#D9BD86',view:'front',embroidery:6});
   document.getElementById('floatGarment').innerHTML = garmentSVG({color:'#B48A4A',ink:'#241F17',gold:'#12291F',view:'front',embroidery:9});
@@ -783,14 +789,13 @@
     PRODUCTS.filter(function(p){ return filter==='all' || p.cat===filter; }).forEach(function(p){
       var card = document.createElement('div');
       card.className = 'pcard';
-      var frontSvg = garmentSVG({color:p.colors[0].v, ink:'#241F17', gold:'#B48A4A', view:'front', sleeveless:p.sleeveless, embroidery:p.embroidery});
       var swatches = p.colors.map(function(c){ return '<i style="background:'+c.v+'"></i>'; }).join('');
       card.style.position = 'relative';
       card.innerHTML =
         (p.badge ? '<div class="pbadge">'+p.badge+'</div>' : '') +
         '<div class="pcard-inner">'+
           '<div class="pface front">'+
-            '<div class="pface-art">'+svgWrap(frontSvg)+'</div>'+
+            '<div class="pface-art"><img src="'+PRODUCT_IMAGES[p.id]+'" alt="'+p.name+'" loading="lazy"></div>'+
             '<div class="pface-meta"><div class="name">'+p.name+'</div><div class="fabric">'+p.fabric+'</div><div class="price">Rs. '+p.price.toLocaleString()+'</div></div>'+
           '</div>'+
           '<div class="pface back">'+
@@ -857,7 +862,8 @@
     overlay.classList.add('open');
   };
   function renderModalGarment(){
-    modalGarment.innerHTML = garmentSVG({color:selColor.v, ink:'#241F17', gold:'#B48A4A', view:'front', sleeveless:currentProduct.sleeveless, embroidery:currentProduct.embroidery});
+    modalGarment.src = PRODUCT_IMAGES[currentProduct.id];
+    modalGarment.alt = currentProduct.name;
   }
   document.getElementById('modalClose').addEventListener('click', function(){ overlay.classList.remove('open'); });
   overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.classList.remove('open'); });
@@ -911,7 +917,7 @@
     } else {
       drawerBody.innerHTML = cart.map(function(c, i){
         return '<div class="cart-item">'+
-          svgWrap(garmentSVG({color:c.colorHex, ink:'#241F17', gold:'#B48A4A', view:'front', sleeveless:c.sleeveless, embroidery:c.embroidery}))+
+          '<img src="'+PRODUCT_IMAGES[c.id]+'" alt="'+c.name+'">'+
           '<div style="flex:1;">'+
             '<div class="ci-name">'+c.name+'</div>'+
             '<div class="ci-meta">'+c.color+' · Size '+c.size+' · Rs. '+c.price.toLocaleString()+'</div>'+
