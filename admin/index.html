@@ -172,6 +172,7 @@
       <button class="nav-item active" data-view="overview">Overview</button>
       <button class="nav-item" data-view="products">Products</button>
       <button class="nav-item" data-view="categories">Categories</button>
+      <button class="nav-item" data-view="customers">Customers</button>
       <button class="nav-item" data-view="orders">Orders</button>
     </nav>
     <main class="admin-main">
@@ -201,6 +202,16 @@
           <button class="primary small" type="submit">Add</button>
         </form>
         <div id="categoriesList" class="table-wrap"><p class="muted">Loading…</p></div>
+      </section>
+
+      <section id="view-customers" class="view" style="display:none;">
+        <div class="view-head">
+          <div>
+            <h1>Customers</h1>
+            <p class="muted">Customer records from Supabase.</p>
+          </div>
+        </div>
+        <div id="customersList" class="table-wrap"><p class="muted">Loading…</p></div>
       </section>
 
       <section id="view-orders" class="view" style="display:none;">
@@ -352,6 +363,7 @@
       document.getElementById('view-' + btn.dataset.view).style.display = 'block';
       if (btn.dataset.view === 'products') loadProducts();
       if (btn.dataset.view === 'categories') loadCategories();
+      if (btn.dataset.view === 'customers') loadCustomers();
       if (btn.dataset.view === 'overview') loadStats();
       if (btn.dataset.view === 'orders') loadOrders();
     });
@@ -570,6 +582,59 @@
     msg.textContent = 'Saved!';
     setTimeout(() => { closeProductModal(); loadProducts(); }, 700);
   });
+
+  // ================= CUSTOMERS =================
+  async function loadCustomers(){
+    const list = document.getElementById('customersList');
+    list.innerHTML = '<p class="muted">Loading…</p>';
+
+    const [{ data: customers, error: customerError }, { data: orders, error: orderError }] = await Promise.all([
+      sb.from('customers').select('*').order('created_at', { ascending: false }),
+      sb.from('orders').select('customer_id, total')
+    ]);
+
+    if (customerError) {
+      list.innerHTML = '<p class="muted">Error loading customers: ' + customerError.message + '</p>';
+      return;
+    }
+
+    if (orderError) {
+      list.innerHTML = '<p class="muted">Error loading customer orders: ' + orderError.message + '</p>';
+      return;
+    }
+
+    const stats = {};
+    (orders || []).forEach(o => {
+      if (!o.customer_id) return;
+      if (!stats[o.customer_id]) stats[o.customer_id] = { count: 0, total: 0 };
+      stats[o.customer_id].count += 1;
+      stats[o.customer_id].total += Number(o.total || 0);
+    });
+
+    if (!customers || !customers.length) {
+      list.innerHTML = '<p class="muted">No customers yet.</p>';
+      return;
+    }
+
+    list.innerHTML = `<table class="data-table"><thead><tr>
+        <th>Name</th><th>Phone</th><th>Email</th><th>City</th><th>Orders</th><th>Total Spent</th><th>Joined</th>
+      </tr></thead><tbody>` +
+      customers.map(c => {
+        const s = stats[c.id] || { count: 0, total: 0 };
+        const joined = c.created_at ? new Date(c.created_at).toLocaleDateString('en-GB', {
+          day:'2-digit', month:'short', year:'numeric'
+        }) : '—';
+        return `<tr>
+          <td>${c.name || '—'}</td>
+          <td>${c.phone || '—'}</td>
+          <td>${c.email || '—'}</td>
+          <td>${c.city || '—'}</td>
+          <td>${s.count}</td>
+          <td>Rs. ${s.total.toLocaleString('en-PK')}</td>
+          <td>${joined}</td>
+        </tr>`;
+      }).join('') + '</tbody></table>';
+  }
 
   // ================= ORDERS =================
   const ORDER_STATUSES = ['pending','confirmed','processing','shipped','delivered','cancelled'];
