@@ -604,7 +604,10 @@
         <button id="qtyPlus">+</button>
       </div>
 
-      <button class="btn add-btn" id="modalAddBtn">Add to cart</button>
+      <div class="modal-actions" style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn add-btn" id="modalAddBtn">Add to cart</button>
+        <button class="btn ghost" id="modalWhatsAppBtn" type="button">WhatsApp</button>
+      </div>
     </div>
   </div>
 </div>
@@ -868,6 +871,15 @@
     addToCart(currentProduct, selColor, selSize, qty);
     overlay.classList.remove('open');
     openCart();
+  });
+
+  document.getElementById('modalWhatsAppBtn').addEventListener('click', function(){
+    if(!currentProduct) return;
+    var subtotal = currentProduct.price * qty;
+    var msg = 'Assalam-o-Alaikum RESHAM, I would like to order:\n' +
+      '- ' + currentProduct.name + ' (' + selColor.n + ', size ' + selSize + ') x' + qty +
+      ' = Rs. ' + subtotal.toLocaleString();
+    window.open('https://wa.me/923342667723?text=' + encodeURIComponent(msg), '_blank');
   });
 
   /* ---------------- Cart (persisted per-viewer via localStorage) ---------------- */
