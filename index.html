@@ -612,6 +612,29 @@
   </div>
 </div>
 
+<!-- ============ Checkout form ============ -->
+<div class="overlay" id="checkoutOverlay" role="dialog" aria-modal="true">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-info" style="width:100%;">
+      <button class="modal-close" id="checkoutClose" aria-label="Close">✕</button>
+      <h2 style="margin-bottom:8px;">Checkout</h2>
+      <p style="margin:0 0 18px;color:var(--ink-soft);">Enter customer details to save the order and customer in RESHAM Admin.</p>
+      <form id="checkoutForm">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <input id="customerName" required placeholder="Full name" style="padding:12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;">
+          <input id="customerPhone" required placeholder="Phone / WhatsApp" style="padding:12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;">
+          <input id="customerEmail" type="email" placeholder="Email (optional)" style="padding:12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;">
+          <input id="customerCity" required placeholder="City" style="padding:12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;">
+        </div>
+        <textarea id="customerAddress" required placeholder="Delivery address" rows="3" style="width:100%;margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;resize:vertical;"></textarea>
+        <input id="customerPostal" placeholder="Postal code (optional)" style="width:100%;margin-top:12px;padding:12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;">
+        <button class="btn" id="placeOrderBtn" type="submit" style="width:100%;margin-top:14px;">Save Order & Continue to WhatsApp</button>
+        <p id="checkoutMsg" style="margin:10px 0 0;font-size:13px;color:var(--ink-soft);"></p>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- ============ Cart drawer ============ -->
 <div class="drawer-overlay" id="drawerOverlay"></div>
 <div class="drawer" id="cartDrawer" role="dialog" aria-modal="true">
@@ -626,6 +649,7 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function(){
   "use strict";
@@ -957,13 +981,84 @@
   document.getElementById('drawerClose').addEventListener('click', closeCart);
   drawerOverlay.addEventListener('click', closeCart);
 
+  var checkoutOverlay = document.getElementById('checkoutOverlay');
+  var checkoutMsg = document.getElementById('checkoutMsg');
+  var supabaseUrl = 'https://xpleohaflxzvxqihnenw.supabase.co';
+  var supabaseKey = 'sb_publishable_ty1zSKS0Dp8wbGpaSlEzSQ_tbBX2tIw';
+  var sb = window.supabase.createClient(supabaseUrl, supabaseKey);
+
   document.getElementById('checkoutBtn').addEventListener('click', function(){
     if(cart.length===0) return;
-    var lines = cart.map(function(c){ return '- '+c.name+' ('+c.color+', size '+c.size+') x'+c.qty+' = Rs. '+(c.price*c.qty).toLocaleString(); });
-    var subtotal = cart.reduce(function(s,c){ return s + c.price*c.qty; }, 0);
-    var msg = 'Assalam-o-Alaikum RESHAM, I would like to order:\n' + lines.join('\n') + '\n\nSubtotal: Rs. ' + subtotal.toLocaleString();
-    var url = 'https://wa.me/923342667723?text=' + encodeURIComponent(msg);
-    window.open(url, '_blank');
+    checkoutMsg.textContent = '';
+    checkoutOverlay.classList.add('open');
+  });
+  document.getElementById('checkoutClose').addEventListener('click', function(){ checkoutOverlay.classList.remove('open'); });
+  checkoutOverlay.addEventListener('click', function(e){ if(e.target===checkoutOverlay) checkoutOverlay.classList.remove('open'); });
+
+  document.getElementById('checkoutForm').addEventListener('submit', async function(e){
+    e.preventDefault();
+    if(cart.length===0) return;
+    var btn = document.getElementById('placeOrderBtn');
+    btn.disabled = true;
+    checkoutMsg.textContent = 'Saving your order…';
+
+    try{
+      var customer = {
+        name: document.getElementById('customerName').value.trim(),
+        phone: document.getElementById('customerPhone').value.trim(),
+        email: document.getElementById('customerEmail').value.trim() || null,
+        address: document.getElementById('customerAddress').value.trim(),
+        city: document.getElementById('customerCity').value.trim(),
+        postal_code: document.getElementById('customerPostal').value.trim() || null
+      };
+
+      var customerResult = await sb.from('customers').insert(customer).select().single();
+      if(customerResult.error) throw customerResult.error;
+      var customerId = customerResult.data.id;
+
+      var subtotal = cart.reduce(function(s,c){ return s + c.price*c.qty; }, 0);
+      var orderResult = await sb.from('orders').insert({
+        customer_id: customerId,
+        subtotal: subtotal,
+        delivery_charge: 0,
+        total: subtotal,
+        payment_method: 'COD',
+        status: 'pending'
+      }).select().single();
+      if(orderResult.error) throw orderResult.error;
+      var orderId = orderResult.data.id;
+      var orderNumber = orderResult.data.order_number || orderId.slice(0,8);
+
+      var items = cart.map(function(c){
+        return {
+          order_id: orderId,
+          product_id: c.id,
+          product_name: c.name,
+          variant_size: c.size,
+          variant_color: c.color,
+          quantity: c.qty,
+          unit_price: c.price,
+          subtotal: c.price * c.qty
+        };
+      });
+      var itemsResult = await sb.from('order_items').insert(items);
+      if(itemsResult.error) throw itemsResult.error;
+
+      var lines = cart.map(function(c){ return '- '+c.name+' ('+c.color+', size '+c.size+') x'+c.qty+' = Rs. '+(c.price*c.qty).toLocaleString(); });
+      var msg = 'Assalam-o-Alaikum RESHAM, I would like to order:\nOrder: '+orderNumber+'\n' + lines.join('\n') + '\n\nCustomer: '+customer.name+'\nPhone: '+customer.phone+'\nAddress: '+customer.address+', '+customer.city+'\n\nTotal: Rs. ' + subtotal.toLocaleString();
+      window.open('https://wa.me/923342667723?text=' + encodeURIComponent(msg), '_blank');
+
+      cart = [];
+      saveCart();
+      renderCart();
+      checkoutOverlay.classList.remove('open');
+      checkoutMsg.textContent = '';
+      alert('Order saved successfully. Your WhatsApp order message is ready.');
+    } catch(err){
+      checkoutMsg.textContent = 'Could not save order: ' + (err.message || err);
+    } finally {
+      btn.disabled = false;
+    }
   });
 
   /* ---------------- FAQ accordion ---------------- */
