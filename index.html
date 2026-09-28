@@ -1012,23 +1012,20 @@
         postal_code: document.getElementById('customerPostal').value.trim() || null
       };
 
-      // Reuse an existing customer when the same phone number is used.
-      // This prevents duplicate customer rows when the same buyer places multiple orders.
-      var existingCustomerQuery = await sb.from('customers')
-        .select('id')
-        .eq('phone', customer.phone)
-        .limit(1);
+      // Securely reuse/create the customer through the Supabase RPC.
+      // The RPC checks the phone number server-side without exposing customer rows.
+      var customerRpc = await sb.rpc('get_or_create_customer', {
+        p_name: customer.name,
+        p_phone: customer.phone,
+        p_email: customer.email,
+        p_address: customer.address,
+        p_city: customer.city,
+        p_postal_code: customer.postal_code
+      });
 
-      if(existingCustomerQuery.error) throw existingCustomerQuery.error;
+      if(customerRpc.error) throw customerRpc.error;
 
-      var customerId;
-      if(existingCustomerQuery.data && existingCustomerQuery.data.length > 0){
-        customerId = existingCustomerQuery.data[0].id;
-      } else {
-        var customerResult = await sb.from('customers').insert(customer).select().single();
-        if(customerResult.error) throw customerResult.error;
-        customerId = customerResult.data.id;
-      }
+      var customerId = customerRpc.data;
 
       var subtotal = cart.reduce(function(s,c){ return s + c.price*c.qty; }, 0);
       var orderResult = await sb.from('orders').insert({
