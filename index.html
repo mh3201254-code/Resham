@@ -242,7 +242,9 @@
 
   /* ---------- Fullscreen film ---------- */
   .film{ position:relative; height:100vh; min-height:520px; overflow:hidden; background:var(--emerald-deep); }
-  .film-scene{ position:absolute; inset:0; }
+  .film-video-bg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center center; z-index:0; }
+  .film-video-overlay{ position:absolute; inset:0; z-index:1; background:linear-gradient(90deg, rgba(10,20,15,.72) 0%, rgba(10,20,15,.32) 48%, rgba(10,20,15,.12) 100%); }
+  .film-scene{ position:absolute; inset:0; z-index:1; }
   .film-ribbon{ position:absolute; top:-10%; width:36%; height:130%; opacity:0.55;
     background:linear-gradient(180deg, transparent, var(--gold) 40%, transparent 80%);
     filter:blur(2px); animation: drift 14s ease-in-out infinite; }
@@ -492,6 +494,10 @@
 
 <!-- ================= FULLSCREEN FILM ================= -->
 <section class="film" id="film">
+  <video class="film-video-bg" autoplay muted loop playsinline preload="metadata" aria-hidden="true">
+    <source src="hero-video.mp4" type="video/mp4">
+  </video>
+  <div class="film-video-overlay"></div>
   <div class="film-scene">
     <div class="film-ribbon r1"></div>
     <div class="film-ribbon r2"></div>
