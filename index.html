@@ -1012,9 +1012,23 @@
         postal_code: document.getElementById('customerPostal').value.trim() || null
       };
 
-      var customerResult = await sb.from('customers').insert(customer).select().single();
-      if(customerResult.error) throw customerResult.error;
-      var customerId = customerResult.data.id;
+      // Reuse an existing customer when the same phone number is used.
+      // This prevents duplicate customer rows when the same buyer places multiple orders.
+      var existingCustomerQuery = await sb.from('customers')
+        .select('id')
+        .eq('phone', customer.phone)
+        .limit(1);
+
+      if(existingCustomerQuery.error) throw existingCustomerQuery.error;
+
+      var customerId;
+      if(existingCustomerQuery.data && existingCustomerQuery.data.length > 0){
+        customerId = existingCustomerQuery.data[0].id;
+      } else {
+        var customerResult = await sb.from('customers').insert(customer).select().single();
+        if(customerResult.error) throw customerResult.error;
+        customerId = customerResult.data.id;
+      }
 
       var subtotal = cart.reduce(function(s,c){ return s + c.price*c.qty; }, 0);
       var orderResult = await sb.from('orders').insert({
