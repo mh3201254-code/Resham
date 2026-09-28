@@ -660,7 +660,7 @@
   }
 
   // ================= ORDERS =================
-  const ORDER_STATUSES = ['new','confirmed','processing','shipped','delivered','cancelled'];
+  const ORDER_STATUSES = [...new Set(['new','confirmed','processing','shipped','delivered','cancelled'])];
 
   function fmtDate(iso){
     if(!iso) return '—';
