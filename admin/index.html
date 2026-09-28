@@ -80,7 +80,7 @@
   .badge.published{ background:#E9F3ED; color:var(--emerald); }
   .badge.draft{ background:#F0EAD6; color:var(--gold); }
   .badge.hidden, .badge.out_of_stock{ background:#FBEAE9; color:var(--danger); }
-  .badge.pending{ background:#F0EAD6; color:var(--gold); }
+  .badge.new{ background:#F0EAD6; color:var(--gold); }
   .badge.confirmed{ background:#E9F3ED; color:var(--emerald); }
   .badge.processing{ background:#EAF1FA; color:#2E5C8A; }
   .badge.shipped{ background:#EFEAFB; color:#5B3FA0; }
@@ -660,7 +660,7 @@
   }
 
   // ================= ORDERS =================
-  const ORDER_STATUSES = ['pending','confirmed','processing','shipped','delivered','cancelled'];
+  const ORDER_STATUSES = ['new','confirmed','processing','shipped','delivered','cancelled'];
 
   function fmtDate(iso){
     if(!iso) return '—';
@@ -778,7 +778,7 @@
     const unitsSold = activeOrders.reduce((sum, o) =>
       sum + (o.order_items || []).reduce((n, item) => n + Number(item.quantity || 0), 0), 0
     );
-    const pending = rows.filter(o => o.status === 'pending').length;
+    const pending = rows.filter(o => o.status === 'new').length;
 
     document.getElementById('analyticsSales').textContent = 'Rs. ' + totalSales.toLocaleString('en-PK');
     document.getElementById('analyticsOrders').textContent = rows.length;
@@ -791,7 +791,7 @@
       const status = o.status || 'unknown';
       statusCounts[status] = (statusCounts[status] || 0) + 1;
     });
-    const statusOrder = ['pending','confirmed','processing','shipped','delivered','cancelled'];
+    const statusOrder = ['new','confirmed','processing','shipped','delivered','cancelled'];
     const statuses = statusOrder.filter(s => statusCounts[s]).concat(
       Object.keys(statusCounts).filter(s => !statusOrder.includes(s))
     );
@@ -812,7 +812,7 @@
   async function loadStats(){
     const [{ count: totalProducts }, { count: newOrders }, { count: totalCustomers }, { count: oos }] = await Promise.all([
       sb.from('products').select('*', { count: 'exact', head: true }),
-      sb.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+      sb.from('orders').select('*', { count: 'exact', head: true }).eq('status', 'new'),
       sb.from('customers').select('*', { count: 'exact', head: true }),
       sb.from('products').select('*', { count: 'exact', head: true }).eq('status', 'out_of_stock')
     ]);
