@@ -1023,7 +1023,7 @@
         delivery_charge: 0,
         total: subtotal,
         payment_method: 'COD',
-        status: 'pending'
+        status: 'new'
       }).select().single();
       if(orderResult.error) throw orderResult.error;
       var orderId = orderResult.data.id;
