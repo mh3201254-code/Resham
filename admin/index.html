@@ -711,6 +711,13 @@
     if (document.getElementById('view-overview').style.display !== 'none') loadStats();
   };
 
+  window.updateOrderStatusFromModal = async function(id, status){
+    await window.updateOrderStatus(id, status);
+    const o = ordersCache.find(o => o.id === id);
+    if (o) viewOrder(id);
+    loadOrders();
+  };
+
   window.viewOrder = function(id){
     const o = ordersCache.find(o => o.id === id);
     if (!o) return;
@@ -737,7 +744,7 @@
       <div class="order-detail-row"><b>Delivery charge</b><span>Rs. ${o.delivery_charge ?? '0'}</span></div>
       <div class="order-detail-row"><b>Grand total</b><span>Rs. ${o.total}</span></div>
       <div class="order-detail-row"><b>Payment method</b><span>${o.payment_method || '—'}</span></div>
-      <div class="order-detail-row"><b>Status</b><span class="badge ${o.status}">${o.status}</span></div>
+      <div class="order-detail-row"><b>Status</b><select class="status-select" onchange="updateOrderStatusFromModal('${o.id}', this.value)">\n        ${ORDER_STATUSES.map(s => `<option value="${s}" ${o.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`).join('')}\n      </select></div>
       ${o.notes ? `<div class="order-detail-row"><b>Notes</b><span>${o.notes}</span></div>` : ''}
     `;
     document.getElementById('orderModal').style.display = 'flex';
