@@ -159,6 +159,10 @@
     display:flex; flex-direction:column; align-items:center; gap:8px; color:#C8BFA6; font-size:11px; letter-spacing:.04em; }
   .scroll-cue svg{ width:14px; height:20px; animation: cueBounce 1.8s ease-in-out infinite; }
   @keyframes cueBounce{ 0%,100%{ transform:translateY(0); opacity:.5;} 50%{ transform:translateY(6px); opacity:1;} }
+  @media (max-width:720px){
+    .hero h1{ order:4; margin-top:24px; }
+    .hero-stage{ order:5; }
+  }
   @media (prefers-reduced-motion: reduce){ .scroll-cue svg{ animation:none; } }
 
   /* ---------- Marquee ---------- */
