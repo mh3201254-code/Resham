@@ -1101,7 +1101,7 @@
 
       var lines = cart.map(function(c){ return '- '+c.name+' ('+c.color+', size '+c.size+') x'+c.qty+' = Rs. '+(c.price*c.qty).toLocaleString(); });
       var msg = 'Assalam-o-Alaikum RESHAM, I would like to order:\nOrder: '+orderNumber+'\n' + lines.join('\n') + '\n\nCustomer: '+customer.name+'\nPhone: '+customer.phone+'\nAddress: '+customer.address+', '+customer.city+'\n\nTotal: Rs. ' + subtotal.toLocaleString();
-      window.open('https://wa.me/923342667723?text=' + encodeURIComponent(msg), '_blank');
+      window.location.href = 'https://wa.me/923342667723?text=' + encodeURIComponent(msg);
 
       cart = [];
       saveCart();
