@@ -1067,6 +1067,7 @@
     if(cart.length===0) return;
     checkoutMsg.textContent = '';
     renderCheckoutSummary();
+    closeCart();
     checkoutOverlay.classList.add('open');
   });
 
