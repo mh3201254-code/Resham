@@ -670,9 +670,9 @@
 <div class="overlay" id="checkoutOverlay" role="dialog" aria-modal="true">
   <div class="modal" style="max-width:560px;">
     <div class="modal-info" style="width:100%;">
-      <button class="modal-close" id="checkoutClose" aria-label="Close">✕</button>
-      <h2 style="margin-bottom:8px;">Checkout</h2>
-      <p style="margin:0 0 18px;color:var(--ink-soft);">Enter customer details to save the order and customer in RESHAM Admin.</p>
+      <h2 style="margin-bottom:8px;">Order Summary</h2>
+      <div id="checkoutSummary" style="margin:0 0 18px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--card);"></div>
+      <p style="margin:0 0 18px;color:var(--ink-soft);">Enter your details below. After submitting, WhatsApp will open with your order.</p>
       <form id="checkoutForm">
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
           <input id="customerName" required placeholder="Full name" style="padding:12px;border:1px solid var(--line);border-radius:8px;background:transparent;color:inherit;">
@@ -1047,12 +1047,29 @@
   var supabaseKey = 'sb_publishable_ty1zSKS0Dp8wbGpaEzSlEQ_tbBX2tIw';
   var sb = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+  var checkoutSummary = document.getElementById('checkoutSummary');
+
+  function renderCheckoutSummary(){
+    if(!checkoutSummary) return;
+    var subtotal = cart.reduce(function(s,c){ return s + c.price*c.qty; }, 0);
+    checkoutSummary.innerHTML = cart.map(function(c){
+      return '<div style="display:flex;justify-content:space-between;gap:12px;margin-bottom:8px;font-size:13px;">' +
+        '<span>' + c.name + ' · ' + c.color + ' · Size ' + c.size + ' × ' + c.qty + '</span>' +
+        '<b>Rs. ' + (c.price*c.qty).toLocaleString() + '</b>' +
+      '</div>';
+    }).join('') +
+    '<div style="border-top:1px dashed var(--line);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;font-family:\'Fraunces\';font-size:18px;">' +
+      '<span>Total</span><b>Rs. ' + subtotal.toLocaleString() + '</b>' +
+    '</div>';
+  }
+
   document.getElementById('checkoutBtn').addEventListener('click', function(){
     if(cart.length===0) return;
     checkoutMsg.textContent = '';
+    renderCheckoutSummary();
     checkoutOverlay.classList.add('open');
   });
-  document.getElementById('checkoutClose').addEventListener('click', function(){ checkoutOverlay.classList.remove('open'); });
+
   checkoutOverlay.addEventListener('click', function(e){ if(e.target===checkoutOverlay) checkoutOverlay.classList.remove('open'); });
 
   document.getElementById('checkoutForm').addEventListener('submit', async function(e){
