@@ -3,6 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>
+/* Mobile homepage only: prevent an old #film/#section URL or browser scroll restoration
+   from jumping the normal homepage away from the Hero. Explicit section navigation
+   after the page is loaded remains unchanged. */
+(function(){
+  if (window.matchMedia && window.matchMedia('(max-width:720px)').matches) {
+    try { history.scrollRestoration = 'manual'; } catch(e) {}
+    if (location.hash) {
+      try { history.replaceState(null, document.title, location.pathname + location.search); } catch(e) {}
+    }
+  }
+})();
+</script>
 <title>RESHAM — Atelier 2026 | Pakistani Women's Lawn, Silk & Chiffon</title>
 <meta name="description" content="RESHAM Atelier — premium Pakistani womenswear in lawn, silk, chiffon &amp; velvet. Explore refined fashion and order across Pakistan.">
 <meta name="theme-color" content="#12291F">
