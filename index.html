@@ -691,6 +691,22 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/* Mobile-only: always start the normal homepage at the top.
+   Preserve explicit section links such as #film. */
+(function(){
+  if (window.matchMedia('(max-width:720px)').matches && !window.location.hash) {
+    try { history.scrollRestoration = 'manual'; } catch(e) {}
+    window.scrollTo(0, 0);
+    window.addEventListener('load', function(){
+      window.scrollTo(0, 0);
+      setTimeout(function(){ window.scrollTo(0, 0); }, 0);
+    }, { once:true });
+  }
+})();
+</script>
+
 <script>
 (function(){
   "use strict";
