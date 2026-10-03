@@ -1058,9 +1058,10 @@
   document.getElementById('checkoutForm').addEventListener('submit', async function(e){
     e.preventDefault();
     if(cart.length===0) return;
+
     var btn = document.getElementById('placeOrderBtn');
     btn.disabled = true;
-    checkoutMsg.textContent = 'Saving your order…';
+    checkoutMsg.textContent = 'Opening WhatsApp…';
 
     try{
       var customer = {
@@ -1072,60 +1073,36 @@
         postal_code: document.getElementById('customerPostal').value.trim() || null
       };
 
-      // Securely reuse/create the customer through the Supabase RPC.
-      // The RPC checks the phone number server-side without exposing customer rows.
-      var customerRpc = await sb.rpc('get_or_create_customer', {
-        p_name: customer.name,
-        p_phone: customer.phone,
-        p_email: customer.email,
-        p_address: customer.address,
-        p_city: customer.city,
-        p_postal_code: customer.postal_code
-      });
-
-      if(customerRpc.error) throw customerRpc.error;
-
-      var customerId = customerRpc.data;
-
       var subtotal = cart.reduce(function(s,c){ return s + c.price*c.qty; }, 0);
-      var orderResult = await sb.from('orders').insert({
-        customer_id: customerId,
-        subtotal: subtotal,
-        delivery_charge: 0,
-        total: subtotal,
-        payment_method: 'COD',
-        status: 'new'
-      }).select().single();
-      if(orderResult.error) throw orderResult.error;
-      var orderId = orderResult.data.id;
-      var orderNumber = orderResult.data.order_number || orderId.slice(0,8);
-
-      var items = cart.map(function(c){
-        return {
-          order_id: orderId,
-            product_name: c.name,
-          variant_size: c.size,
-          variant_color: c.color,
-          quantity: c.qty,
-          unit_price: c.price,
-          subtotal: c.price * c.qty
-        };
+      var lines = cart.map(function(c){
+        return '- ' + c.name + ' (' + c.color + ', size ' + c.size + ') x' + c.qty +
+          ' = Rs. ' + (c.price*c.qty).toLocaleString();
       });
-      var itemsResult = await sb.from('order_items').insert(items);
-      if(itemsResult.error) throw itemsResult.error;
 
-      var lines = cart.map(function(c){ return '- '+c.name+' ('+c.color+', size '+c.size+') x'+c.qty+' = Rs. '+(c.price*c.qty).toLocaleString(); });
-      var msg = 'Assalam-o-Alaikum RESHAM, I would like to order:\nOrder: '+orderNumber+'\n' + lines.join('\n') + '\n\nCustomer: '+customer.name+'\nPhone: '+customer.phone+'\nAddress: '+customer.address+', '+customer.city+'\n\nTotal: Rs. ' + subtotal.toLocaleString();
-      window.location.href = 'https://wa.me/923342667723?text=' + encodeURIComponent(msg);
+      // Open WhatsApp synchronously from the user's submit action.
+      // This avoids mobile popup blockers and does not depend on Supabase/RLS.
+      var msg = 'Assalam-o-Alaikum RESHAM, I would like to order:\n' +
+        lines.join('\n') +
+        '\n\nCustomer: ' + customer.name +
+        '\nPhone: ' + customer.phone +
+        '\nAddress: ' + customer.address + ', ' + customer.city +
+        '\n\nTotal: Rs. ' + subtotal.toLocaleString();
+
+      var whatsappUrl = 'https://wa.me/923342667723?text=' + encodeURIComponent(msg);
+      var whatsappWindow = window.open(whatsappUrl, '_blank');
+
+      // Fallback for browsers that block a new tab/window.
+      if(!whatsappWindow){
+        window.location.href = whatsappUrl;
+      }
 
       cart = [];
       saveCart();
       renderCart();
       checkoutOverlay.classList.remove('open');
       checkoutMsg.textContent = '';
-      alert('Order saved successfully. Your WhatsApp order message is ready.');
     } catch(err){
-      checkoutMsg.textContent = 'Could not save order: ' + (err.message || err);
+      checkoutMsg.textContent = 'Could not open WhatsApp: ' + (err.message || err);
     } finally {
       btn.disabled = false;
     }
